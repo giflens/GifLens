@@ -19,7 +19,7 @@ Coming soon.
 
 ## Known Issues
 
-[You know](https://media.giphy.com/media/JICGwZlbzui4w/giphy.gif)
+![You know](https://media.giphy.com/media/JICGwZlbzui4w/giphy.gif)
 
 ## Release Notes
 
