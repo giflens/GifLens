@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:giflens"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
