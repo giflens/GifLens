@@ -1,0 +1,16 @@
+{
+  "scopeName": "giflens",
+  "injectionSelector": "L:comment.line.double-slash",
+  "patterns": [
+    {
+      "include": "#giflens-tag"
+    }
+  ],
+  "repository": {
+    "giflens-tag": {
+      "begin": "GIFLENS",
+      "end": ".gif",
+      "name": "markup.bold.giflens"
+    }
+  }
+}
