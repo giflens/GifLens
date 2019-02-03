@@ -9,6 +9,11 @@ Visualize GIFLENS tags just by hovering them in your code.
 IMAGE GOES HERE
 \!\[feature X\]\(images/feature-x.png\)
 
+Search for GIFs using the `giflens` command directly in VS Code.
+
+IMAGE GOES HERE
+\!\[feature X\]\(images/feature-x.png\)
+
 ## Requirements
 
 Just install `giflens` in the VS Code extension panel.
@@ -26,5 +31,11 @@ Coming soon.
 ### 1.0.0-alpha
 
 Just looking around 👀
+
+## Thank you
+
+* The VS Code team for building an awesome open source IDE 🙏
+* The Gitlens team who helped us finding a name for this extension. Love your product too ❤️
+* The Giphy team for their great api and endless database of amazing GIFs 😎
 
 **Enjoy!**
