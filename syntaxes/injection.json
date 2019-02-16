@@ -1,5 +1,5 @@
 {
-  "injectionSelector": "L:comment",
+  "injectionSelector": "R:comment",
   "patterns": [
     {
       "include": "#giflens-tag"
@@ -7,8 +7,8 @@
   ],
   "repository": {
     "giflens-tag": {
-      "begin": "GIFLENS",
-      "end": ".gif",
+      "begin": "GIFLENS-",
+      "end": ".gif|\r|\n",
       "name": "markup.bold.giflens"
     }
   }
