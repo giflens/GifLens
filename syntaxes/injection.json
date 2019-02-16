@@ -1,5 +1,5 @@
 {
-  "injectionSelector": "R:comment",
+  "injectionSelector": "L:comment",
   "patterns": [
     {
       "include": "#giflens-tag"
