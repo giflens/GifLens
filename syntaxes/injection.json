@@ -1,6 +1,6 @@
 {
   "scopeName": "giflens",
-  "injectionSelector": "L:comment.line.double-slash",
+  "injectionSelector": "L:comment",
   "patterns": [
     {
       "include": "#giflens-tag"
