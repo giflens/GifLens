@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
+import searchHandler from "./search";
+
 const myTextDecoration = vscode.window.createTextEditorDecorationType({
   color: "pink",
   rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
@@ -44,21 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand("giflens", () => {
-    // The code you place here will be executed every time your command is executed
-    vscode.window
-      .showInputBox({
-        placeHolder: "your gif search",
-        prompt: "Enter your search, and press Enter"
-      })
-      .then(value => {
-        if (value) {
-          vscode.window.showInformationMessage(value);
-        }
-      });
-    // Display a message box to the user
-    // vscode.window.showInformationMessage('Hello Giflens!');
-  });
+  let disposable = vscode.commands.registerCommand("giflens", searchHandler);
 
   // TODO DELETE
   vscode.window.showInformationMessage("Starting Giflens!");
