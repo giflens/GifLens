@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { url } from 'inspector';
 
 const search = async () => {
 	// creating a container to collect the url of the image selected
@@ -18,9 +17,12 @@ const search = async () => {
 				enableScripts: true,
 			} // Webview options. authorizes js
 		);
+
+		// part about getting the data and creating the img html tags for the images.
 		const searchResults: string[] = await fakeData();
 		const images: string = createImages(searchResults);
 
+		// urlToUse is defined with a promise that will be resolved once the click event is fired
 		const urlToUse = await new Promise(resolve => {
 			panel.webview.html = `<!DOCTYPE html>
     <html lang="en">
@@ -31,12 +33,15 @@ const search = async () => {
     </head>
     <body>
         ${images}
-        <div class="test">Hello</div>
         <script>
-        const test = document.getElementsByClassName('test');
-        test.innerHtml="script runs";
+        // acquiring the vscode webview specific api to send messages to the extension
         const vscode = acquireVsCodeApi();
+
+        // finding the images and putting them into an array
         const searchImages = document.getElementsByClassName('search-img');
+        var arr = [...searchImages];
+
+        // event handler that sends back to the extension the url of the clicked gif
         const sendUrl = event => {
           console.log("clicked");
           const url = event.target.getAttribute('src');
@@ -45,7 +50,8 @@ const search = async () => {
             text: url,
           });
         };
-        var arr = [...searchImages];
+        
+        // attaching the click listener to each image
         arr.forEach(gifItem => {gifItem.addEventListener('click', sendUrl)})
         
         </script>
@@ -58,12 +64,16 @@ const search = async () => {
 					case 'url':
 						// resolve the promise to the url of the picture
 						resolve(message.text);
+						// dispose of the subscription to the webview messages
 						subscription.dispose();
+						// dispose of the webview
 						panel.dispose();
 						return;
 				}
 			});
 		});
+
+		// TODO create the text in the editor instead of logging
 		console.log(urlToUse);
 	} else {
 		vscode.window.showInformationMessage('You have to enter your GIF search');
