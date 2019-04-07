@@ -19,6 +19,15 @@
                 "command": "giflens",
                 "title": "Giflens"
             }
+        ],
+        "grammars": [
+            {
+                "path": "./syntaxes/injection.json",
+                "scopeName": "giflens",
+                "injectTo": [
+                    "source.js"
+                ]
+            }
         ]
     },
     "scripts": {
