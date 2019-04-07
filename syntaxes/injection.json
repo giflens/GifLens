@@ -1,4 +1,5 @@
 {
+  "scopeName": "giflens",
   "injectionSelector": "L:comment",
   "patterns": [
     {
