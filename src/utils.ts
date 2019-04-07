@@ -1,5 +1,3 @@
-import { IncomingMessage } from 'http';
-
 const axios = require('axios');
 
 const GIPHY_API_KEY = 'VDTsjv7FD1PCrcZ5AtyhYMSPW2TREanK';
