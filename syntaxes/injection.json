@@ -1,15 +1,16 @@
 {
-    "injectionSelector": "L:comment",
-    "patterns": [
-        {
-            "include": "#giflens-tag"
-        }
-    ],
-    "repository": {
-        "giflens-tag": {
-            "begin": "GIFLENS-",
-            "end": ".gif|\r|\n",
-            "name": "markup.bold.giflens"
-        }
-    }
+	"scopeName": "giflens",
+	"injectionSelector": "L:comment",
+	"patterns": [
+		{
+			"include": "#giflens-tag"
+		}
+	],
+	"repository": {
+		"giflens-tag": {
+			"begin": "GIFLENS-",
+			"end": ".gif|\r|\n",
+			"name": "markup.bold.giflens"
+		}
+	}
 }
