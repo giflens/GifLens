@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+import { searchGif } from './utils';
+
 const search = async () => {
 	// creating a container to collect the url of the image selected
 	// let urlToUse: string = '';
@@ -19,7 +21,7 @@ const search = async () => {
 		);
 
 		// part about getting the data and creating the img html tags for the images.
-		const searchResults: string[] = await fakeData();
+		const searchResults: string[] = await searchGif(searchInput);
 		const images: string = createImages(searchResults);
 
 		// urlToUse is defined with a promise that will be resolved once the click event is fired
