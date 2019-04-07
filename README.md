@@ -1,4 +1,4 @@
-# Giflens 
+# Giflens
 
 > GifLens **supercharges** the GIF capabilities built into Visual Studio Code. It helps you to **visualize GIFs** at a glance using `GIFLENS` tags and code lens, **seamlessly navigate and explore** Gif repositories, **gain valuable insights** via powerful GIFs, and so much more.
 
@@ -22,6 +22,16 @@ Just install `giflens` in the VS Code extension panel.
 
 Coming soon.
 
+## Debugging / Testing the extension locally
+
+To run the extension locally, clone the repo, then just run the project in the debugging tab, it should be automatically recognized by VS Code.
+
+<img src="./docs/assets/debug.png" alt="debugging the extension" height="300"/>
+
+VS Code wuill open another editor where you can test inserting and previewing Gifs.
+
+<img src="./docs/assets/preview-demo.gif" alt="debugging the extension" width="800"/>
+
 ## Known Issues
 
 ![You know](https://media.giphy.com/media/JICGwZlbzui4w/giphy.gif)
@@ -34,8 +44,8 @@ Just looking around 👀
 
 ## Thank you
 
-* The VS Code team for building an awesome open source IDE 🙏
-* The Gitlens team who helped us finding a name for this extension. Love your product too ❤️
-* The Giphy team for their great api and endless database of amazing GIFs 😎
+- The VS Code team for building an awesome open source IDE 🙏
+- The Gitlens team who helped us finding a name for this extension. Love your product too ❤️
+- The Giphy team for their great api and endless database of amazing GIFs 😎
 
 **Enjoy!**
