@@ -6,11 +6,11 @@ const search = async (editor: vscode.TextEditor) => {
 	// TODO check that the selection is empty
 	// TODO check that we are in a comment
 	// grabbing the current location to insert the edit later with the GIFLENS tag
-	const position = editor.selection.active;
+	const position: vscode.Position = editor.selection.active;
 	// creating a container to collect the url of the image selected
 	// let urlToUse: string = '';
 	// The code you place here will be executed every time your command is executed
-	const searchInput = await vscode.window.showInputBox({
+	const searchInput: string | undefined = await vscode.window.showInputBox({
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
@@ -64,18 +64,20 @@ const search = async (editor: vscode.TextEditor) => {
     </html>`;
 
 			// create a listener to the webview to catch when the user clicks the image he has selected
-			const subscription = panel.webview.onDidReceiveMessage(message => {
-				switch (message.command) {
-					case 'url':
-						// resolve the promise to the url of the picture
-						resolve(message.text);
-						// dispose of the subscription to the webview messages
-						subscription.dispose();
-						// dispose of the webview
-						panel.dispose();
-						return;
+			const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
+				message => {
+					switch (message.command) {
+						case 'url':
+							// resolve the promise to the url of the picture
+							resolve(message.text);
+							// dispose of the subscription to the webview messages
+							subscription.dispose();
+							// dispose of the webview
+							panel.dispose();
+							return;
+					}
 				}
-			});
+			);
 
 			// TODO manage the case when the user closes the window without picking an image
 		});
