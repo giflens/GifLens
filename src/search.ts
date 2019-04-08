@@ -2,11 +2,14 @@ import * as vscode from 'vscode';
 
 import { searchGif } from './utils';
 
-const search = async () => {
+const search = async (editor: vscode.TextEditor) => {
+	// TODO check that the selection is empty
+	// TODO check that we are in a comment
+	const position = editor.selection.active;
 	// creating a container to collect the url of the image selected
 	// let urlToUse: string = '';
 	// The code you place here will be executed every time your command is executed
-	let searchInput = await vscode.window.showInputBox({
+	const searchInput = await vscode.window.showInputBox({
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
@@ -31,7 +34,7 @@ const search = async () => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Cat Coding</title>
+        <title>Search Gif</title>
     </head>
     <body>
         ${images}
@@ -45,7 +48,6 @@ const search = async () => {
 
         // event handler that sends back to the extension the url of the clicked gif
         const sendUrl = event => {
-          console.log("clicked");
           const url = event.target.getAttribute('src');
           vscode.postMessage({
             command: 'url',
@@ -73,19 +75,21 @@ const search = async () => {
 						return;
 				}
 			});
+
+			// TODO manage the case when the user closes the window without picking an image
 		});
 
-		// TODO create the text in the editor instead of logging
-		console.log(urlToUse);
+		editor.edit(editBuilder => {
+			let positionToInsert = new vscode.Position(position.line, 0);
+			editBuilder.insert(
+				positionToInsert,
+				`${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
+			);
+		});
 	} else {
 		vscode.window.showInformationMessage('You have to enter your GIF search');
 	}
 };
-
-const fakeData = () => [
-	'https://media.giphy.com/media/2ywgbxmJyIoKdVaYew/giphy-downsized-large.gif',
-	'https://media.giphy.com/media/2ywgbxmJyIoKdVaYew/giphy-downsized-large.gif',
-];
 
 const createImages = (urls: string[]) => {
 	let images: string = '';
@@ -94,5 +98,7 @@ const createImages = (urls: string[]) => {
 	}
 	return images;
 };
+
+const getLanguageCommentStart = () => '//';
 
 export default search;
