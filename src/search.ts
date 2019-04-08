@@ -5,6 +5,7 @@ import { searchGif } from './utils';
 const search = async (editor: vscode.TextEditor) => {
 	// TODO check that the selection is empty
 	// TODO check that we are in a comment
+	// grabbing the current location to insert the edit later with the GIFLENS tag
 	const position = editor.selection.active;
 	// creating a container to collect the url of the image selected
 	// let urlToUse: string = '';
@@ -80,10 +81,12 @@ const search = async (editor: vscode.TextEditor) => {
 		});
 
 		editor.edit(editBuilder => {
+			// goes to the begining of the line to create the GIFLENS tag the line above after insertion
 			let positionToInsert = new vscode.Position(position.line, 0);
 			editBuilder.insert(
 				positionToInsert,
 				`${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
+				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
 			);
 		});
 	} else {
@@ -99,6 +102,7 @@ const createImages = (urls: string[]) => {
 	return images;
 };
 
+// for later, maybe find the comment characters from the current language
 const getLanguageCommentStart = () => '//';
 
 export default search;
