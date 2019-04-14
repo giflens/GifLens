@@ -2,6 +2,40 @@ import * as vscode from 'vscode';
 
 import { searchGif } from './utils';
 
+const webviewHtml: (imagesHtml: string) => string = (imagesHtml: string) =>
+	`<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Search Gif</title>
+    </head>
+    <body>
+        ${imagesHtml}
+        <script>
+        // acquiring the vscode webview specific api to send messages to the extension
+        const vscode = acquireVsCodeApi();
+
+        // finding the images and putting them into an array
+        const searchImages = document.getElementsByClassName('search-img');
+        var arr = [...searchImages];
+
+        // event handler that sends back to the extension the url of the clicked gif
+        const sendUrl = event => {
+          const url = event.target.getAttribute('src');
+          vscode.postMessage({
+            command: 'url',
+            text: url,
+          });
+        };
+        
+        // attaching the click listener to each image
+        arr.forEach(gifItem => {gifItem.addEventListener('click', sendUrl)})
+        
+        </script>
+    </body>
+    </html>`;
+
 const search = async (editor: vscode.TextEditor) => {
 	// TODO check that the selection is empty
 	// TODO check that we are in a comment
@@ -30,38 +64,7 @@ const search = async (editor: vscode.TextEditor) => {
 
 		// urlToUse is defined with a promise that will be resolved once the click event is fired
 		const urlToUse = await new Promise(resolve => {
-			panel.webview.html = `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Search Gif</title>
-    </head>
-    <body>
-        ${images}
-        <script>
-        // acquiring the vscode webview specific api to send messages to the extension
-        const vscode = acquireVsCodeApi();
-
-        // finding the images and putting them into an array
-        const searchImages = document.getElementsByClassName('search-img');
-        var arr = [...searchImages];
-
-        // event handler that sends back to the extension the url of the clicked gif
-        const sendUrl = event => {
-          const url = event.target.getAttribute('src');
-          vscode.postMessage({
-            command: 'url',
-            text: url,
-          });
-        };
-        
-        // attaching the click listener to each image
-        arr.forEach(gifItem => {gifItem.addEventListener('click', sendUrl)})
-        
-        </script>
-    </body>
-    </html>`;
+			panel.webview.html = webviewHtml(images);
 
 			// create a listener to the webview to catch when the user clicks the image he has selected
 			const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
