@@ -82,13 +82,21 @@ const search = async (editor: vscode.TextEditor) => {
 		});
 
 		editor.edit(editBuilder => {
+			const lineBeginningChars: number = editor.document.lineAt(position)
+				.firstNonWhitespaceCharacterIndex;
 			// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
 			let positionToInsert = new vscode.Position(position.line, 0);
-			// TODO when adding the GIFLENS comment, would be great to use the same indentation as surrounding code
 			// TODO when the line is empty, do not create an extra line (remove the \r)
 			editBuilder.insert(
 				positionToInsert,
-				`${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
+				`${
+					// insertSpaces returns false if the user uses tabs, true if the user uses spaces
+					// it is defined per document in VSCode, so if the user voluntarily changes it on one line, this code will not work
+					editor.options.insertSpaces
+						? // returns the correct indentation character for the user
+						  ' '.repeat(lineBeginningChars)
+						: '\t'.repeat(lineBeginningChars)
+				}${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
 				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
 			);
 		});
