@@ -37,12 +37,8 @@ const webviewHtml: (imagesHtml: string) => string = (imagesHtml: string) =>
     </html>`;
 
 const search = async (editor: vscode.TextEditor) => {
-	// TODO check that the selection is empty
-	// TODO check that we are in a comment
 	// grabbing the current location to insert the edit later with the GIFLENS tag
 	const position: vscode.Position = editor.selection.active;
-	// creating a container to collect the url of the image selected
-	// let urlToUse: string = '';
 	// The code you place here will be executed every time your command is executed
 	const searchInput: string | undefined = await vscode.window.showInputBox({
 		placeHolder: 'your gif search',
@@ -86,8 +82,10 @@ const search = async (editor: vscode.TextEditor) => {
 		});
 
 		editor.edit(editBuilder => {
-			// goes to the begining of the line to create the GIFLENS tag the line above after insertion
+			// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
 			let positionToInsert = new vscode.Position(position.line, 0);
+			// TODO when adding the GIFLENS comment, would be great to use the same indentation as surrounding code
+			// TODO when the line is empty, do not create an extra line (remove the \r)
 			editBuilder.insert(
 				positionToInsert,
 				`${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
@@ -99,12 +97,8 @@ const search = async (editor: vscode.TextEditor) => {
 	}
 };
 
-const createImages = (urls: string[]) => {
-	let images: string = '';
-	for (let url of urls) {
-		images += `<img class="search-img" src="${url}" />`;
-	}
-	return images;
+const createImages: (urls: string[]) => string = (urls: string[]) => {
+	return urls.map(url => `<img class="search-img" src="${url}" />`).join('');
 };
 
 // for later, maybe find the comment characters from the current language
