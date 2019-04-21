@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+import searchHandler from './search';
+
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
 // COPY HERE
@@ -39,11 +41,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('giflens', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		// vscode.window.showInformationMessage('Hello Giflens!');
-	});
+	const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
+		'giflens',
+		searchHandler
+	);
 
 	// TODO DELETE
 	vscode.window.showInformationMessage('Starting Giflens!');
