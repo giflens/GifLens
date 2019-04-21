@@ -45,6 +45,16 @@ const search = async (editor: vscode.TextEditor) => {
 		prompt: 'Enter your search, and press Enter',
 	});
 	if (searchInput) {
+		// part about getting the data and creating the img html tags for the images.
+		const searchResults: string[] = await searchGif(searchInput);
+		if (searchResults.length === 0) {
+			vscode.window.showInformationMessage(
+				'Your search did not return any result'
+			);
+			return false;
+		}
+
+		const images: string = createImages(searchResults);
 		const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
 			'gifSearch', // Identifies the type of the webview. Used internally
 			'Gif Results', // Title of the panel displayed to the user
@@ -53,10 +63,6 @@ const search = async (editor: vscode.TextEditor) => {
 				enableScripts: true,
 			} // Webview options. authorizes js
 		);
-
-		// part about getting the data and creating the img html tags for the images.
-		const searchResults: string[] = await searchGif(searchInput);
-		const images: string = createImages(searchResults);
 
 		// urlToUse is defined with a promise that will be resolved once the click event is fired
 		const urlToUse = await new Promise(resolve => {
