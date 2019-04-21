@@ -77,8 +77,6 @@ const search = async (editor: vscode.TextEditor) => {
 					}
 				}
 			);
-
-			// TODO manage the case when the user closes the window without picking an image
 		});
 
 		editor.edit(editBuilder => {
