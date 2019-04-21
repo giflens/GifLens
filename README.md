@@ -48,4 +48,6 @@ Just looking around 👀
 - The Gitlens team who helped us finding a name for this extension. Love your product too ❤️
 - The Giphy team for their great api and endless database of amazing GIFs 😎
 
+<img src="./docs/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif" alt="debugging the extension" width="200"/>
+
 **Enjoy!**
