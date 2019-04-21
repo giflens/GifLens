@@ -42,6 +42,7 @@
 					"source.js.jsx",
 					"source.less",
 					"source.lua",
+					"source.makefile",
 					"source.objc",
 					"source.objcpp",
 					"source.perl",
