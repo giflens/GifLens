@@ -88,12 +88,14 @@ const search = async (editor: vscode.TextEditor) => {
 		editor.edit(editBuilder => {
 			// getting the position where to insert (beginning of the current line)
 			let positionToInsert = new vscode.Position(position.line, 0);
+			// first case when the selected line is empty, we do not create a new line
 			if (editor.document.lineAt(position).isEmptyOrWhitespace) {
 				editBuilder.insert(
 					positionToInsert,
 					`${getLanguageCommentStart()} GIFLENS-${urlToUse}`
 					// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
 				);
+				// else second case when using it from a line of code, we insert a new line above
 			} else {
 				// getting the number of spaces or tabs at the beginning of the line
 				const lineBeginningChars: number = editor.document.lineAt(position)
@@ -114,7 +116,9 @@ const search = async (editor: vscode.TextEditor) => {
 			}
 		});
 	} else {
-		vscode.window.showInformationMessage('You have to enter your GIF search');
+		vscode.window.showInformationMessage(
+			'GifLens: You have to enter your GIF search'
+		);
 	}
 };
 
