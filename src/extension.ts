@@ -15,7 +15,7 @@ vscode.languages.registerHoverProvider('*', {
 		document: vscode.TextDocument,
 		position: vscode.Position,
 		token: vscode.CancellationToken
-	): vscode.Hover {
+	): vscode.Hover | null {
 		const range = document.getWordRangeAtPosition(position, giflensRegexp);
 
 		if (range) {
@@ -26,7 +26,7 @@ vscode.languages.registerHoverProvider('*', {
 			);
 			return new vscode.Hover(`![GIF](${url})`);
 		} else {
-			return new vscode.Hover('rien');
+			return null;
 		}
 	},
 });
