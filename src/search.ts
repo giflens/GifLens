@@ -45,6 +45,16 @@ const search = async (editor: vscode.TextEditor) => {
 		prompt: 'Enter your search, and press Enter',
 	});
 	if (searchInput) {
+		// part about getting the data and creating the img html tags for the images.
+		const searchResults: string[] = await searchGif(searchInput);
+		if (searchResults.length === 0) {
+			vscode.window.showInformationMessage(
+				'Your search did not return any result'
+			);
+			return false;
+		}
+
+		const images: string = createImages(searchResults);
 		const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
 			'gifSearch', // Identifies the type of the webview. Used internally
 			'Gif Results', // Title of the panel displayed to the user
@@ -53,10 +63,6 @@ const search = async (editor: vscode.TextEditor) => {
 				enableScripts: true,
 			} // Webview options. authorizes js
 		);
-
-		// part about getting the data and creating the img html tags for the images.
-		const searchResults: string[] = await searchGif(searchInput);
-		const images: string = createImages(searchResults);
 
 		// urlToUse is defined with a promise that will be resolved once the click event is fired
 		const urlToUse = await new Promise(resolve => {
@@ -77,23 +83,42 @@ const search = async (editor: vscode.TextEditor) => {
 					}
 				}
 			);
-
-			// TODO manage the case when the user closes the window without picking an image
 		});
 
 		editor.edit(editBuilder => {
-			// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
+			// getting the position where to insert (beginning of the current line)
 			let positionToInsert = new vscode.Position(position.line, 0);
-			// TODO when adding the GIFLENS comment, would be great to use the same indentation as surrounding code
-			// TODO when the line is empty, do not create an extra line (remove the \r)
-			editBuilder.insert(
-				positionToInsert,
-				`${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
-				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
-			);
+			// first case when the selected line is empty, we do not create a new line
+			if (editor.document.lineAt(position).isEmptyOrWhitespace) {
+				editBuilder.insert(
+					positionToInsert,
+					`${getLanguageCommentStart()} GIFLENS-${urlToUse}`
+					// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
+				);
+				// else second case when using it from a line of code, we insert a new line above
+			} else {
+				// getting the number of spaces or tabs at the beginning of the line
+				const lineBeginningChars: number = editor.document.lineAt(position)
+					.firstNonWhitespaceCharacterIndex;
+				// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
+				editBuilder.insert(
+					positionToInsert,
+					`${
+						// insertSpaces returns false if the user uses tabs, true if the user uses spaces
+						// it is defined per document in VSCode, so if the user voluntarily changes it on one line, this code will not work
+						editor.options.insertSpaces
+							? // returns the correct indentation character for the user
+							  ' '.repeat(lineBeginningChars)
+							: '\t'.repeat(lineBeginningChars)
+					}${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
+					// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
+				);
+			}
 		});
 	} else {
-		vscode.window.showInformationMessage('You have to enter your GIF search');
+		vscode.window.showInformationMessage(
+			'GifLens: You have to enter your GIF search'
+		);
 	}
 };
 

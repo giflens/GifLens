@@ -38,14 +38,18 @@ VS Code wuill open another editor where you can test inserting and previewing Gi
 
 ## Release Notes
 
-### 1.0.0-alpha
+### 1.0.0
 
-Just looking around 👀
+- hover a GIFLENS tag to visualize a gif inside your code editor
+- VS Code command to search a gif and inserting it when clicking on the preview
+- Supported file types : `.js`, `.ts`, `.jsx`
 
 ## Thank you
 
-- The VS Code team for building an awesome open source IDE 🙏
-- The Gitlens team who helped us finding a name for this extension. Love your product too ❤️
-- The Giphy team for their great api and endless database of amazing GIFs 😎
+- The [VS Code](https://code.visualstudio.com/) team for building an awesome open source IDE 🙏
+- The [Gitlens](https://github.com/eamodio/vscode-gitlens) team who helped us finding a name for this extension. Love your product too ❤️
+- The [Giphy](https://giphy.com/) team for their great api and endless database of amazing GIFs 😎
+
+<a href="https://giphy.com/"><img src="./docs/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif" alt="debugging the extension" width="200"/></a>
 
 **Enjoy!**
