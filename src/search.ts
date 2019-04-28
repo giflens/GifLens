@@ -134,7 +134,11 @@ const createImages: (urls: string[]) => string = (urls: string[]) => {
 	return urls.map(url => `<img class="search-img" src="${url}" />`).join('');
 };
 
-// for later, maybe find the comment characters from the current language
+/**
+ * The syntax to open a comment for a specific language.
+ * @param languageId The languageId (handled by VS code).
+ * @returns A String to open a comment.
+ */
 const getLanguageCommentStart = (languageId: String) => {
 	switch (languageId) {
 		case 'bat':
@@ -191,7 +195,8 @@ const getLanguageCommentStart = (languageId: String) => {
 /**
  * The (optional) closing comment syntax for the language.
  * All the results need to start with a space!
- * @param languageId
+ * @param languageId The languageId (handled by VS code).
+ * @returns A String, mepty for most cases.
  */
 const getLanguageCommentEnd = (languageId: String) => {
 	switch (languageId) {
