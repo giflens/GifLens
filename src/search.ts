@@ -92,7 +92,11 @@ const search = async (editor: vscode.TextEditor) => {
 			if (editor.document.lineAt(position).isEmptyOrWhitespace) {
 				editBuilder.insert(
 					positionToInsert,
-					`${getLanguageCommentStart()} GIFLENS-${urlToUse}`
+					`${getLanguageCommentStart(
+						editor.document.languageId
+					)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
+						editor.document.languageId
+					)}`
 					// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
 				);
 				// else second case when using it from a line of code, we insert a new line above
@@ -110,7 +114,11 @@ const search = async (editor: vscode.TextEditor) => {
 							? // returns the correct indentation character for the user
 							  ' '.repeat(lineBeginningChars)
 							: '\t'.repeat(lineBeginningChars)
-					}${getLanguageCommentStart()} GIFLENS-${urlToUse}\r`
+					}${getLanguageCommentStart(
+						editor.document.languageId
+					)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
+						editor.document.languageId
+					)}\r`
 					// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
 				);
 			}
@@ -127,6 +135,74 @@ const createImages: (urls: string[]) => string = (urls: string[]) => {
 };
 
 // for later, maybe find the comment characters from the current language
-const getLanguageCommentStart = () => '//';
+const getLanguageCommentStart = (languageId: String) => {
+	switch (languageId) {
+		case 'bat':
+			return 'REM';
+		case 'clojure':
+			return ';';
+		case 'ruby':
+		case 'coffeescript':
+		case 'dockerfile':
+		case 'makefile':
+		case 'perl':
+		case 'powershell':
+		case 'python':
+		case 'r':
+		case 'shellscript':
+		case 'yaml':
+			return '#';
+		case 'c':
+		case 'css':
+			return '/*';
+		case 'html':
+		case 'markdown':
+			return '<!--';
+		case 'lua':
+		case 'sql':
+			return '--';
+		case 'swift':
+			return '///';
+		case 'vb':
+			return "'";
+		case 'javascript':
+		case 'typescript':
+		case 'cpp':
+		case 'csharp':
+		case 'fsharp':
+		case 'go':
+		case 'groovy':
+		case 'java':
+		case 'javascriptreact':
+		case 'less':
+		case 'objective-c':
+		case 'objective-cpp':
+		case 'php':
+		case 'jade':
+		case 'rust':
+		case 'scss':
+		case 'sass':
+		case 'typescriptreact':
+		default:
+			return '//';
+	}
+};
+
+/**
+ * The (optional) closing comment syntax for the language.
+ * All the results need to start with a space!
+ * @param languageId
+ */
+const getLanguageCommentEnd = (languageId: String) => {
+	switch (languageId) {
+		case 'c':
+		case 'css':
+			return ' */';
+		case 'html':
+			return ' -->';
+		default:
+			return '';
+	}
+};
 
 export default search;
