@@ -36,6 +36,18 @@ const webviewHtml: (imagesHtml: string) => string = (imagesHtml: string) =>
     </body>
     </html>`;
 
+const errorHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GifLens down</title>
+</head>
+<body>
+<img src="https://media.giphy.com/media/mq5y2jHRCAqMo/giphy.gif"
+</body>
+</html>`;
+
 const search = async (editor: vscode.TextEditor) => {
 	// grabbing the current location to insert the edit later with the GIFLENS tag
 	const position: vscode.Position = editor.selection.active;
@@ -45,84 +57,88 @@ const search = async (editor: vscode.TextEditor) => {
 		prompt: 'Enter your search, and press Enter',
 	});
 	if (searchInput) {
-		// part about getting the data and creating the img html tags for the images.
-		const searchResults: string[] = await searchGif(searchInput);
-		if (searchResults.length === 0) {
-			vscode.window.showInformationMessage(
-				'Your search did not return any result'
-			);
-			return false;
-		}
-
-		const images: string = createImages(searchResults);
-		const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
-			'gifSearch', // Identifies the type of the webview. Used internally
-			'Gif Results', // Title of the panel displayed to the user
-			vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
-			{
-				enableScripts: true,
-			} // Webview options. authorizes js
-		);
-
-		// urlToUse is defined with a promise that will be resolved once the click event is fired
-		const urlToUse = await new Promise(resolve => {
-			panel.webview.html = webviewHtml(images);
-
-			// create a listener to the webview to catch when the user clicks the image he has selected
-			const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
-				message => {
-					switch (message.command) {
-						case 'url':
-							// resolve the promise to the url of the picture
-							resolve(message.text);
-							// dispose of the subscription to the webview messages
-							subscription.dispose();
-							// dispose of the webview
-							panel.dispose();
-							return;
-					}
-				}
-			);
-		});
-
-		editor.edit(editBuilder => {
-			// getting the position where to insert (beginning of the current line)
-			let positionToInsert = new vscode.Position(position.line, 0);
-			// first case when the selected line is empty, we do not create a new line
-			if (editor.document.lineAt(position).isEmptyOrWhitespace) {
-				editBuilder.insert(
-					positionToInsert,
-					`${getLanguageCommentStart(
-						editor.document.languageId
-					)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-						editor.document.languageId
-					)}`
-					// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
+		try {
+			// part about getting the data and creating the img html tags for the images.
+			const searchResults: string[] = await searchGif(searchInput);
+			if (searchResults.length === 0) {
+				vscode.window.showInformationMessage(
+					'Your search did not return any result'
 				);
-				// else second case when using it from a line of code, we insert a new line above
-			} else {
-				// getting the number of spaces or tabs at the beginning of the line
-				const lineBeginningChars: number = editor.document.lineAt(position)
-					.firstNonWhitespaceCharacterIndex;
-				// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
-				editBuilder.insert(
-					positionToInsert,
-					`${
-						// insertSpaces returns false if the user uses tabs, true if the user uses spaces
-						// it is defined per document in VSCode, so if the user voluntarily changes it on one line, this code will not work
-						editor.options.insertSpaces
-							? // returns the correct indentation character for the user
-							  ' '.repeat(lineBeginningChars)
-							: '\t'.repeat(lineBeginningChars)
-					}${getLanguageCommentStart(
-						editor.document.languageId
-					)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-						editor.document.languageId
-					)}\r`
-					// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
-				);
+				return false;
 			}
-		});
+
+			const images: string = createImages(searchResults);
+			const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
+				'gifSearch', // Identifies the type of the webview. Used internally
+				'Gif Results', // Title of the panel displayed to the user
+				vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
+				{
+					enableScripts: true,
+				} // Webview options. authorizes js
+			);
+
+			// urlToUse is defined with a promise that will be resolved once the click event is fired
+			const urlToUse = await new Promise(resolve => {
+				panel.webview.html = webviewHtml(images);
+
+				// create a listener to the webview to catch when the user clicks the image he has selected
+				const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
+					message => {
+						switch (message.command) {
+							case 'url':
+								// resolve the promise to the url of the picture
+								resolve(message.text);
+								// dispose of the subscription to the webview messages
+								subscription.dispose();
+								// dispose of the webview
+								panel.dispose();
+								return;
+						}
+					}
+				);
+			});
+
+			editor.edit(editBuilder => {
+				// getting the position where to insert (beginning of the current line)
+				let positionToInsert = new vscode.Position(position.line, 0);
+				// first case when the selected line is empty, we do not create a new line
+				if (editor.document.lineAt(position).isEmptyOrWhitespace) {
+					editBuilder.insert(
+						positionToInsert,
+						`${getLanguageCommentStart(
+							editor.document.languageId
+						)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
+							editor.document.languageId
+						)}`
+						// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
+					);
+					// else second case when using it from a line of code, we insert a new line above
+				} else {
+					// getting the number of spaces or tabs at the beginning of the line
+					const lineBeginningChars: number = editor.document.lineAt(position)
+						.firstNonWhitespaceCharacterIndex;
+					// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
+					editBuilder.insert(
+						positionToInsert,
+						`${
+							// insertSpaces returns false if the user uses tabs, true if the user uses spaces
+							// it is defined per document in VSCode, so if the user voluntarily changes it on one line, this code will not work
+							editor.options.insertSpaces
+								? // returns the correct indentation character for the user
+								  ' '.repeat(lineBeginningChars)
+								: '\t'.repeat(lineBeginningChars)
+						}${getLanguageCommentStart(
+							editor.document.languageId
+						)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
+							editor.document.languageId
+						)}\r`
+						// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
+					);
+				}
+			});
+		} catch (err) {
+			handleApiError(err);
+		}
 	} else {
 		vscode.window.showInformationMessage(
 			'GifLens: You have to enter your GIF search'
@@ -208,6 +224,23 @@ const getLanguageCommentEnd = (languageId: String) => {
 		default:
 			return '';
 	}
+};
+
+// function to handle API errors
+const handleApiError = (err: Error) => {
+	// displaying an error message
+	vscode.window.showErrorMessage(
+		'GifLens: It seems GIFs are on a break at the moment'
+	);
+
+	// displaying a funny gif for the error
+	const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
+		'gifError', // Identifies the type of the webview. Used internally
+		'GifLens Error', // Title of the panel displayed to the user
+		vscode.ViewColumn.Beside // Editor column to show the new webview panel in.
+	);
+
+	panel.webview.html = errorHtml;
 };
 
 export default search;
