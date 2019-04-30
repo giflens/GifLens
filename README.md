@@ -42,7 +42,41 @@ VS Code wuill open another editor where you can test inserting and previewing Gi
 
 - hover a GIFLENS tag to visualize a gif inside your code editor
 - VS Code command to search a gif and inserting it when clicking on the preview
-- Supported file types : `.js`, `.ts`, `.jsx`
+- Supported languages :
+  - bat scripts
+  - clojure
+  - coffeescript
+  - C
+  - C++
+  - C#
+  - CSS
+  - Dockerfile
+  - F#
+  - Go
+  - Groovy
+  - HTML
+  - Java
+  - JavaScript
+  - JSX
+  - LESS
+  - LUA
+  - Makefile
+  - Objective C
+  - Objective C++
+  - Perl
+  - PHP
+  - Powershell scripts
+  - Python
+  - R
+  - Ruby
+  - Rust
+  - SASS / SCSS
+  - SQL
+  - Swift
+  - TypeScript
+  - TSX
+  - Visual Basic
+  - Yaml
 
 ## Thank you
 
