@@ -2,7 +2,9 @@ import * as vscode from 'vscode';
 
 import { searchGif } from './utils';
 
-const webviewHtml: (imagesHtml: string) => string = (imagesHtml: string) =>
+export const webviewHtml: (imagesHtml: string) => string = (
+	imagesHtml: string
+) =>
 	`<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -48,7 +50,7 @@ const errorHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const search = async (editor: vscode.TextEditor) => {
+export const search = async (editor: vscode.TextEditor) => {
 	// grabbing the current location to insert the edit later with the GIFLENS tag
 	const position: vscode.Position = editor.selection.active;
 	// The code you place here will be executed every time your command is executed
@@ -146,7 +148,7 @@ const search = async (editor: vscode.TextEditor) => {
 	}
 };
 
-const createImages: (urls: string[]) => string = (urls: string[]) => {
+export const createImages: (urls: string[]) => string = (urls: string[]) => {
 	return urls.map(url => `<img class="search-img" src="${url}" />`).join('');
 };
 
@@ -155,7 +157,7 @@ const createImages: (urls: string[]) => string = (urls: string[]) => {
  * @param languageId The languageId (handled by VS code).
  * @returns A String to open a comment.
  */
-const getLanguageCommentStart = (languageId: String) => {
+export const getLanguageCommentStart = (languageId: String) => {
 	switch (languageId) {
 		case 'bat':
 			return 'REM';
@@ -214,7 +216,7 @@ const getLanguageCommentStart = (languageId: String) => {
  * @param languageId The languageId (handled by VS code).
  * @returns A String, mepty for most cases.
  */
-const getLanguageCommentEnd = (languageId: String) => {
+export const getLanguageCommentEnd = (languageId: String) => {
 	switch (languageId) {
 		case 'c':
 		case 'css':
@@ -227,7 +229,7 @@ const getLanguageCommentEnd = (languageId: String) => {
 };
 
 // function to handle API errors
-const handleApiError = (err: Error) => {
+export const handleApiError = (err: Error) => {
 	// displaying an error message
 	vscode.window.showErrorMessage(
 		'GifLens: It seems GIFs are on a break at the moment'
