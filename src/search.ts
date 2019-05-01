@@ -50,7 +50,10 @@ const errorHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export const search = async (editor: vscode.TextEditor) => {
+export const search = async (
+	editor: vscode.TextEditor,
+	context: vscode.ExtensionContext
+) => {
 	// The code you place here will be executed every time your command is executed
 	const searchInput: string | undefined = await vscode.window.showInputBox({
 		placeHolder: 'your gif search',
