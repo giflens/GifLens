@@ -50,7 +50,16 @@ const errorHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export const search = async (
+/**
+ * handler for the search TextEditorCommand
+ * @param  {vscode.TextEditor} editor the active vsCode editor at the time the command is run
+ * @param  {vscode.ExtensionContext} context the context of the extension
+ * TODO: use the context to be able to store the failure gif inside the extension, rather than fetching it on the internet
+ */
+export const search: (
+	editor: vscode.TextEditor,
+	context: vscode.ExtensionContext
+) => Promise<boolean> = async (
 	editor: vscode.TextEditor,
 	context: vscode.ExtensionContext
 ) => {
@@ -59,10 +68,13 @@ export const search = async (
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
-	searchTask(searchInput, editor);
+	return searchTask(searchInput, editor).then(result => result);
 };
 
-export const searchTask = async (
+export const searchTask: (
+	searchInput: string | undefined,
+	editor: vscode.TextEditor
+) => Promise<boolean> = async (
 	searchInput: string | undefined,
 	editor: vscode.TextEditor
 ) => {
@@ -81,50 +93,16 @@ export const searchTask = async (
 			}
 
 			// urlToUse is defined with a promise that will be resolved once a user clicks a GIF
-			const urlToUse = await new Promise(resolve =>
+			const urlToUse: string = await new Promise(resolve =>
 				getChosenGifUrl(searchResults, resolve)
 			);
 
-			editor.edit(editBuilder => {
-				// getting the position where to insert (beginning of the current line)
-				let positionToInsert = new vscode.Position(position.line, 0);
-				// first case when the selected line is empty, we do not create a new line
-				if (editor.document.lineAt(position).isEmptyOrWhitespace) {
-					editBuilder.insert(
-						positionToInsert,
-						`${getLanguageCommentStart(
-							editor.document.languageId
-						)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-							editor.document.languageId
-						)}`
-						// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
-					);
-					// else second case when using it from a line of code, we insert a new line above
-				} else {
-					// getting the number of spaces or tabs at the beginning of the line
-					const lineBeginningChars: number = editor.document.lineAt(position)
-						.firstNonWhitespaceCharacterIndex;
-					// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
-					editBuilder.insert(
-						positionToInsert,
-						`${
-							// insertSpaces returns false if the user uses tabs, true if the user uses spaces
-							// it is defined per document in VSCode, so if the user voluntarily changes it on one line, this code will not work
-							editor.options.insertSpaces
-								? // returns the correct indentation character for the user
-								  ' '.repeat(lineBeginningChars)
-								: '\t'.repeat(lineBeginningChars)
-						}${getLanguageCommentStart(
-							editor.document.languageId
-						)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-							editor.document.languageId
-						)}\r`
-						// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
-					);
-				}
-			});
+			return addGifLensTagToEditor(editor, position, urlToUse).then(
+				result => result
+			);
 		} catch (err) {
-			handleApiError(err);
+			// if an error is returned from the search, calls the handleAPIError function
+			return handleApiError(err);
 		}
 	}
 	// if the user did not enter anything, send an info message
@@ -132,13 +110,70 @@ export const searchTask = async (
 		vscode.window.showInformationMessage(
 			'GifLens: You have to enter your GIF search'
 		);
+		return false;
 	}
 };
 
+const addGifLensTagToEditor: (
+	editor: vscode.TextEditor,
+	position: vscode.Position,
+	url: string
+) => Thenable<boolean> = (editor, position, urlToUse) => {
+	return editor.edit(editBuilder => {
+		// getting the position where to insert (beginning of the current line)
+		let positionToInsert = new vscode.Position(position.line, 0);
+		// first case when the selected line is empty, we do not create a new line
+		if (editor.document.lineAt(position).isEmptyOrWhitespace) {
+			editBuilder.insert(
+				positionToInsert,
+				`${getLanguageCommentStart(
+					editor.document.languageId
+				)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
+					editor.document.languageId
+				)}`
+				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
+			);
+			// else second case when using it from a line of code, we insert a new line above
+		} else {
+			// getting the number of spaces or tabs at the beginning of the line
+			const lineBeginningChars: number = editor.document.lineAt(position)
+				.firstNonWhitespaceCharacterIndex;
+			// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
+			editBuilder.insert(
+				positionToInsert,
+				`${
+					// insertSpaces returns false if the user uses tabs, true if the user uses spaces
+					// it is defined per document in VSCode, so if the user voluntarily changes it on one line, this code will not work
+					editor.options.insertSpaces
+						? // returns the correct indentation character for the user
+						  ' '.repeat(lineBeginningChars)
+						: '\t'.repeat(lineBeginningChars)
+				}${getLanguageCommentStart(
+					editor.document.languageId
+				)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
+					editor.document.languageId
+				)}\r`
+				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
+			);
+		}
+	});
+};
+
+/**
+ * creates img html tags from a set of gif urls (disposed one after the other)
+ * @param  {string[]} urls an array of gif urls
+ * @returns {string} html img tags as a string
+ */
 export const createImages: (urls: string[]) => string = (urls: string[]) => {
 	return urls.map(url => `<img class="search-img" src="${url}" />`).join('');
 };
 
+/**
+ * a Promise resolver function
+ * uses search results as an array of url strings, creates a webview from it, and resolves on the url of the selected gif
+ * @param  {string[]} searchResults
+ * @param  {Function} resolve
+ */
 export const getChosenGifUrl: (
 	searchResults: string[],
 	resolve: Function
@@ -261,7 +296,7 @@ export const getLanguageCommentEnd = (languageId: String) => {
 };
 
 // function to handle API errors
-export const handleApiError = (err: Error) => {
+export const handleApiError: (err: Error) => boolean = (err: Error) => {
 	// displaying an error message
 	vscode.window.showErrorMessage(
 		'GifLens: It seems GIFs are on a break at the moment'
@@ -275,6 +310,8 @@ export const handleApiError = (err: Error) => {
 	);
 
 	panel.webview.html = errorHtml;
+
+	return false;
 };
 
 export default search;
