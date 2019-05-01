@@ -143,6 +143,7 @@ export const getChosenGifUrl: (
 	searchResults: string[],
 	resolve: Function
 ) => void = (searchResults, resolve) => {
+	// creates a webview panel
 	const panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
 
 	// create a listener to the webview to catch when the user clicks the image he has selected
@@ -162,6 +163,11 @@ export const getChosenGifUrl: (
 	);
 };
 
+/**
+ * creates a Webview panel with the gifs to select from. It is generated from the gif search results
+ * @param  {string[]} searchResults contains an array of url as strings (gif urls)
+ * @returns {vscode.WebviewPanel} a vscode webview panel
+ */
 export const createGifSelectionPanel: (
 	searchResults: string[]
 ) => vscode.WebviewPanel = searchResults => {
