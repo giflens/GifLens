@@ -72,6 +72,7 @@ export const searchTask = async (
 		try {
 			// part about getting the data and creating the img html tags for the images.
 			const searchResults: string[] = await searchGif(searchInput);
+			// if the search did not return anything, send an information message to the user, and break
 			if (searchResults.length === 0) {
 				vscode.window.showInformationMessage(
 					'Your search did not return any result'
@@ -79,36 +80,10 @@ export const searchTask = async (
 				return false;
 			}
 
-			const images: string = createImages(searchResults);
-			const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
-				'gifSearch', // Identifies the type of the webview. Used internally
-				'Gif Results', // Title of the panel displayed to the user
-				vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
-				{
-					enableScripts: true,
-				} // Webview options. authorizes js
+			// urlToUse is defined with a promise that will be resolved once a user clicks a GIF
+			const urlToUse = await new Promise(resolve =>
+				getChosenGifUrl(searchResults, resolve)
 			);
-
-			// urlToUse is defined with a promise that will be resolved once the click event is fired
-			const urlToUse = await new Promise(resolve => {
-				panel.webview.html = webviewHtml(images);
-
-				// create a listener to the webview to catch when the user clicks the image he has selected
-				const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
-					message => {
-						switch (message.command) {
-							case 'url':
-								// resolve the promise to the url of the picture
-								resolve(message.text);
-								// dispose of the subscription to the webview messages
-								subscription.dispose();
-								// dispose of the webview
-								panel.dispose();
-								return;
-						}
-					}
-				);
-			});
 
 			editor.edit(editBuilder => {
 				// getting the position where to insert (beginning of the current line)
@@ -151,7 +126,9 @@ export const searchTask = async (
 		} catch (err) {
 			handleApiError(err);
 		}
-	} else {
+	}
+	// if the user did not enter anything, send an info message
+	else {
 		vscode.window.showInformationMessage(
 			'GifLens: You have to enter your GIF search'
 		);
@@ -160,6 +137,45 @@ export const searchTask = async (
 
 export const createImages: (urls: string[]) => string = (urls: string[]) => {
 	return urls.map(url => `<img class="search-img" src="${url}" />`).join('');
+};
+
+export const getChosenGifUrl: (
+	searchResults: string[],
+	resolve: Function
+) => void = (searchResults, resolve) => {
+	const panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
+
+	// create a listener to the webview to catch when the user clicks the image he has selected
+	const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
+		message => {
+			switch (message.command) {
+				case 'url':
+					// resolve the promise to the url of the picture
+					resolve(message.text);
+					// dispose of the subscription to the webview messages
+					subscription.dispose();
+					// dispose of the webview
+					panel.dispose();
+					return;
+			}
+		}
+	);
+};
+
+export const createGifSelectionPanel: (
+	searchResults: string[]
+) => vscode.WebviewPanel = searchResults => {
+	const images: string = createImages(searchResults);
+	const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
+		'gifSearch', // Identifies the type of the webview. Used internally
+		'Gif Results', // Title of the panel displayed to the user
+		vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
+		{
+			enableScripts: true,
+		} // Webview options. authorizes js
+	);
+	panel.webview.html = webviewHtml(images);
+	return panel;
 };
 
 /**

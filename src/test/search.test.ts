@@ -4,7 +4,6 @@ import {
 	createImages,
 	getLanguageCommentEnd,
 	getLanguageCommentStart,
-	handleApiError,
 } from '../search';
 
 suite('Search Webview', function() {
