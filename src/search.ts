@@ -51,13 +51,20 @@ const errorHtml = `<!DOCTYPE html>
 </html>`;
 
 export const search = async (editor: vscode.TextEditor) => {
-	// grabbing the current location to insert the edit later with the GIFLENS tag
-	const position: vscode.Position = editor.selection.active;
 	// The code you place here will be executed every time your command is executed
 	const searchInput: string | undefined = await vscode.window.showInputBox({
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
+	searchTask(searchInput, editor);
+};
+
+export const searchTask = async (
+	searchInput: string | undefined,
+	editor: vscode.TextEditor
+) => {
+	// grabbing the current location to insert the edit later with the GIFLENS tag
+	const position: vscode.Position = editor.selection.active;
 	if (searchInput) {
 		try {
 			// part about getting the data and creating the img html tags for the images.
