@@ -2,6 +2,10 @@ import * as vscode from 'vscode';
 
 import { searchGif } from './utils';
 
+/**
+ * @param  {string} imagesHtml a string that contains html <img> tags for each gif
+ * @returns {string} a string containing an html document to pass to the webview panel
+ */
 export const webviewHtml: (imagesHtml: string) => string = (
 	imagesHtml: string
 ) =>
@@ -55,6 +59,7 @@ const errorHtml = `<!DOCTYPE html>
  * @param  {vscode.TextEditor} editor the active vsCode editor at the time the command is run
  * @param  {vscode.ExtensionContext} context the context of the extension
  * TODO: use the context to be able to store the failure gif inside the extension, rather than fetching it on the internet
+ * @returns a Promise to a boolean, indicating the final status
  */
 export const search: (
 	editor: vscode.TextEditor,
@@ -68,7 +73,8 @@ export const search: (
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
-	return searchTask(searchInput, editor).then(result => result);
+	const status = await searchTask(searchInput, editor);
+	return status;
 };
 
 export const searchTask: (
@@ -114,6 +120,13 @@ export const searchTask: (
 	}
 };
 
+/**
+ * add a giflens tag with the specified url in the active editor
+ * @param  {vscode.TextEditor} editor the active vscode editor
+ * @param  {vscode.Position} position the position of the cursor in the active vscode editor
+ * @param  {string} url the url of the gif for which to insert a GifLens Tag
+ * @returns {Thenable<boolean} a final status of the insertion
+ */
 const addGifLensTagToEditor: (
 	editor: vscode.TextEditor,
 	position: vscode.Position,
@@ -295,7 +308,11 @@ export const getLanguageCommentEnd = (languageId: String) => {
 	}
 };
 
-// function to handle API errors
+/**
+ * to handle API errors with style
+ * @param  {Error} err an error returned by the API library
+ * @returns {boolean} always returns false to indicate the search did not go thru
+ */
 export const handleApiError: (err: Error) => boolean = (err: Error) => {
 	// displaying an error message
 	vscode.window.showErrorMessage(
