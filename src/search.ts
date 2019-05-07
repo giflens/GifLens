@@ -77,6 +77,12 @@ export const search: (
 	return status;
 };
 
+/**
+ * handle the gif search, selection and edition of the editor (controller)
+ * @param  {string|undefined} searchInput the string entered by the user to launch the gif search
+ * @param  {vscode.TextEditor} editor the current active editor
+ * @returns {Promise<boolean>} the status of the tast, true for completed, false for failure
+ */
 export const searchTask: (
 	searchInput: string | undefined,
 	editor: vscode.TextEditor

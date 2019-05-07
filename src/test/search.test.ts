@@ -1,9 +1,11 @@
 import * as assert from 'assert';
+import * as vscode from 'vscode';
 
 import {
 	createImages,
 	getLanguageCommentEnd,
 	getLanguageCommentStart,
+	searchTask,
 } from '../search';
 
 suite('Search Webview', function() {
@@ -21,7 +23,19 @@ suite('Search Webview', function() {
 	});
 
 	test('given a correct language identifier, getLanguageCommentEnd should return the correct comment end', function() {
-		const commentStart = getLanguageCommentEnd('css');
-		assert(commentStart === ' */');
+		const commentEnd = getLanguageCommentEnd('css');
+		assert(commentEnd === ' */');
+	});
+
+	test('given the user did not enter any search term, searchTask should return false', async function() {
+		// opens a new unnamed document and show it to have a textEditor to work with
+		const newEditor: vscode.TextEditor = await vscode.workspace
+			.openTextDocument({ content: 'for running tests' })
+			.then(document => {
+				return vscode.window.showTextDocument(document);
+			});
+
+		const status = await searchTask(undefined, newEditor);
+		assert(status === false);
 	});
 });
