@@ -109,9 +109,7 @@ export const searchTask: (
 				getChosenGifUrl(searchResults, resolve)
 			);
 
-			return addGifLensTagToEditor(editor, position, urlToUse).then(
-				result => result
-			);
+			return addGifLensTagToEditor(editor, position, urlToUse);
 		} catch (err) {
 			// if an error is returned from the search, calls the handleAPIError function
 			return handleApiError(err);
