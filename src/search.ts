@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { searchGif } from './utils';
 
 /**
+ * creates the html for the webview (boilerplate + img tags from the gif search)
  * @param  {string} imagesHtml a string that contains html <img> tags for each gif
  * @returns {string} a string containing an html document to pass to the webview panel
  */
@@ -209,7 +210,7 @@ export const getChosenGifUrl: (
 					subscription.dispose();
 					// dispose of the webview
 					panel.dispose();
-					return;
+					break;
 			}
 		}
 	);
@@ -313,7 +314,7 @@ export const getLanguageCommentEnd = (languageId: String) => {
 };
 
 /**
- * to handle API errors with style
+ * to handle API errors with style 😎
  * @param  {Error} err an error returned by the API library
  * @returns {boolean} always returns false to indicate the search did not go thru
  */

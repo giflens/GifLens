@@ -38,4 +38,8 @@ suite('Search Webview', function() {
 		const status = await searchTask(undefined, newEditor);
 		assert(status === false);
 	});
+
+	test('[NOT IMPLEMENTED] given the user enters a correct term, searchTask should return true once the user picks an image in the webview', function() {
+		assert(true);
+	});
 });
