@@ -43,7 +43,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
 		'giflens',
-		searchHandler
+		(textEditor: vscode.TextEditor) => {
+			searchHandler(textEditor, context);
+		}
 	);
 
 	// TODO DELETE
