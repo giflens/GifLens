@@ -3,6 +3,11 @@
 	"displayName": "giflens",
 	"description": "Like Gitlens, but with GIFs",
 	"version": "0.0.1",
+	"publisher": "giflens",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/fallanic/GifLens.git"
+	},
 	"engines": {
 		"vscode": "^1.30.0"
 	},
