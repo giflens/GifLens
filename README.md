@@ -6,13 +6,11 @@
 
 Visualize GIFLENS tags just by hovering them in your code.
 
-IMAGE GOES HERE
-\!\[feature X\]\(images/feature-x.png\)
+<img src="./docs/assets/thanos-bae.gif" alt="hover gifs in your code"/>
 
 Search for GIFs using the `giflens` command directly in VS Code.
 
-IMAGE GOES HERE
-\!\[feature X\]\(images/feature-x.png\)
+<img src="./docs/assets/jon-snow.gif" alt="search gifs in vscode"/>
 
 ## Requirements
 
@@ -84,6 +82,6 @@ VS Code wuill open another editor where you can test inserting and previewing Gi
 - The [Gitlens](https://github.com/eamodio/vscode-gitlens) team who helped us finding a name for this extension. Love your product too ❤️
 - The [Giphy](https://giphy.com/) team for their great api and endless database of amazing GIFs 😎
 
-<a href="https://giphy.com/"><img src="./docs/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif" alt="debugging the extension" width="200"/></a>
+<a href="https://giphy.com/"><img src="./docs/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif" alt="Powered by Giphy" width="200"/></a>
 
 **Enjoy!**
