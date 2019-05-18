@@ -307,6 +307,7 @@ export const getLanguageCommentEnd = (languageId: String) => {
 		case 'css':
 			return ' */';
 		case 'html':
+		case 'markdown':
 			return ' -->';
 		default:
 			return '';

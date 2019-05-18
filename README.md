@@ -59,6 +59,7 @@ VS Code will open another editor where you can test inserting and previewing Gif
   - LESS
   - LUA
   - Makefile
+  - Markdown
   - Objective C
   - Objective C++
   - Perl
