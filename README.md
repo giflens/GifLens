@@ -26,7 +26,7 @@ To run the extension locally, clone the repo, then just run the project in the d
 
 <img src="./docs/assets/debug.png" alt="debugging the extension" height="300"/>
 
-VS Code wuill open another editor where you can test inserting and previewing Gifs.
+VS Code will open another editor where you can test inserting and previewing Gifs.
 
 <img src="./docs/assets/preview-demo.gif" alt="debugging the extension" width="800"/>
 
