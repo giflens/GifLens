@@ -200,7 +200,11 @@ const addGifLensTagToEditor: (
  * @returns {string} html img tags as a string
  */
 export const createImages: (urls: string[]) => string = (urls: string[]) => {
-	return urls.map(url => `<img class="search-img" src="${url}" />`).join('');
+	return urls
+		.map(
+			url => `<img class="search-img" style="cursor: pointer;" src="${url}" />`
+		)
+		.join('');
 };
 
 /**
