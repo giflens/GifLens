@@ -22,6 +22,7 @@ export const webviewHtml: (
         <title>Search Gif</title>
     </head>
     <body>
+        <div><img src="https://giflens.org/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif" alt="powered by giphy"/></div>
         ${imagesHtml}
         ${hasLoadMore ? buttonHtml : ''}
         <script>
