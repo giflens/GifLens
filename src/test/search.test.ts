@@ -13,7 +13,7 @@ suite('Search Webview', function() {
 		const createdString = createImages(['1', '2', '3']);
 		assert(
 			createdString ===
-				'<img class="search-img" src="1" /><img class="search-img" src="2" /><img class="search-img" src="3" />'
+				'<img class="search-img" style="cursor: pointer;" src="1" /><img class="search-img" style="cursor: pointer;" src="2" /><img class="search-img" style="cursor: pointer;" src="3" />'
 		);
 	});
 
