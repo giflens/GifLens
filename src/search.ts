@@ -219,7 +219,7 @@ export const getChosenGifUrl: (
 	searchTerm: string
 ) => void = (searchResults, resolve, searchTerm) => {
 	// creates a webview panel
-	let panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
+	const panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
 
 	// create a listener to the webview to catch when the user clicks the image he has selected
 	const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
@@ -236,7 +236,6 @@ export const getChosenGifUrl: (
 				case 'load-more':
 					// get the current page number
 					const currentPage = message.text;
-					console.log(currentPage);
 					const nextResults = await searchGif(searchTerm, currentPage + 1);
 					panel.webview.html =
 						nextResults.length < 10
