@@ -6,11 +6,11 @@
 
 Visualize GIFLENS tags just by hovering them in your code.
 
-<img src="https://github.com/fallanic/GifLens/blob/master/docs/assets/thanos-bae.gif?raw=true" alt="hover gifs in your code"/>
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/thanos-bae.gif?raw=true" alt="hover gifs in your code"/>
 
 Search for GIFs using the `giflens` command directly in VS Code.
 
-<img src="https://github.com/fallanic/GifLens/blob/master/docs/assets/jon-snow.gif?raw=true" alt="search gifs in vscode"/>
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/jon-snow.gif?raw=true" alt="search gifs in vscode"/>
 
 ## Requirements
 
@@ -24,11 +24,11 @@ Coming soon.
 
 To run the extension locally, clone the repo, then just run the project in the debugging tab, it should be automatically recognized by VS Code.
 
-<img src="https://github.com/fallanic/GifLens/blob/master/docs/assets/debug.png?raw=true" alt="debugging the extension" height="300"/>
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/debug.png?raw=true" alt="debugging the extension" height="300"/>
 
 VS Code will open another editor where you can test inserting and previewing Gifs.
 
-<img src="https://github.com/fallanic/GifLens/blob/master/docs/assets/preview-demo.gif?raw=true" alt="debugging the extension" width="800"/>
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/preview-demo.gif?raw=true" alt="debugging the extension" width="800"/>
 
 ## Known Issues
 
@@ -83,6 +83,6 @@ VS Code will open another editor where you can test inserting and previewing Gif
 - The [Gitlens](https://github.com/eamodio/vscode-gitlens) team who helped us finding a name for this extension. Love your product too ❤️
 - The [Giphy](https://giphy.com/) team for their great api and endless database of amazing GIFs 😎
 
-<a href="https://giphy.com/"><img src="https://github.com/fallanic/GifLens/blob/master/docs/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif?raw=true" alt="Powered by Giphy" width="200"/></a>
+<a href="https://giphy.com/"><img src="https://github.com/giflens/GifLens/blob/master/docs/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif?raw=true" alt="Powered by Giphy" width="200"/></a>
 
 **Enjoy!**
