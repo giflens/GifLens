@@ -48,9 +48,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
-	// TODO DELETE
-	vscode.window.showInformationMessage('Starting Giflens!');
-
 	context.subscriptions.push(disposable);
 }
 
