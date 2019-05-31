@@ -7,7 +7,7 @@
 	"icon": "docs/assets/giflens-icon.png",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/fallanic/GifLens.git"
+		"url": "https://github.com/giflens/GifLens.git"
 	},
 	"engines": {
 		"vscode": "^1.30.0"
