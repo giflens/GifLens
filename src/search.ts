@@ -7,10 +7,14 @@ import { searchGif } from './utils';
  * @param  {string} imagesHtml a string that contains html <img> tags for each gif
  * @returns {string} a string containing an html document to pass to the webview panel
  */
-export const webviewHtml: (imagesHtml: string) => string = (
-	imagesHtml: string
-) =>
-	`<!DOCTYPE html>
+export const webviewHtml: (
+	imagesHtml: string,
+	page?: number,
+	hasLoadMore?: boolean
+) => string = (imagesHtml: string, page = 1, hasLoadMore = false) => {
+	const buttonHtml = `<div style="width: 100%; background-color: #6157ff; font-size: 1.5em; text-align: center; color: white; font-weight: 800; cursor: pointer; padding-top: 10px; padding-bottom: 10px;" id="loadMore" data-page="${page}">Load More</div>`;
+
+	return `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -18,7 +22,9 @@ export const webviewHtml: (imagesHtml: string) => string = (
         <title>Search Gif</title>
     </head>
     <body>
+        <div><img src="https://giflens.org/assets/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif" alt="powered by giphy"/></div>
         ${imagesHtml}
+        ${hasLoadMore ? buttonHtml : ''}
         <script>
         // acquiring the vscode webview specific api to send messages to the extension
         const vscode = acquireVsCodeApi();
@@ -38,10 +44,22 @@ export const webviewHtml: (imagesHtml: string) => string = (
         
         // attaching the click listener to each image
         arr.forEach(gifItem => {gifItem.addEventListener('click', sendUrl)})
+
+        // creating the load more action
+        const loadMoreButton = document.getElementById('loadMore');
+        const askForMore = event => {
+          const currentPage = event.target.getAttribute('data-page');
+          vscode.postMessage({
+            command: 'load-more',
+            text: parseInt(currentPage)
+          })
+        }
+        loadMoreButton.addEventListener('click', askForMore);
         
         </script>
     </body>
     </html>`;
+};
 
 const errorHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -107,7 +125,7 @@ export const searchTask: (
 
 			// urlToUse is defined with a promise that will be resolved once a user clicks a GIF
 			const urlToUse: string = await new Promise(resolve =>
-				getChosenGifUrl(searchResults, resolve)
+				getChosenGifUrl(searchResults, resolve, searchInput)
 			);
 
 			return addGifLensTagToEditor(editor, position, urlToUse);
@@ -183,7 +201,11 @@ const addGifLensTagToEditor: (
  * @returns {string} html img tags as a string
  */
 export const createImages: (urls: string[]) => string = (urls: string[]) => {
-	return urls.map(url => `<img class="search-img" src="${url}" />`).join('');
+	return urls
+		.map(
+			url => `<img class="search-img" style="cursor: pointer;" src="${url}" />`
+		)
+		.join('');
 };
 
 /**
@@ -194,14 +216,15 @@ export const createImages: (urls: string[]) => string = (urls: string[]) => {
  */
 export const getChosenGifUrl: (
 	searchResults: string[],
-	resolve: Function
-) => void = (searchResults, resolve) => {
+	resolve: Function,
+	searchTerm: string
+) => void = (searchResults, resolve, searchTerm) => {
 	// creates a webview panel
 	const panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
 
 	// create a listener to the webview to catch when the user clicks the image he has selected
 	const subscription: vscode.Disposable = panel.webview.onDidReceiveMessage(
-		message => {
+		async message => {
 			switch (message.command) {
 				case 'url':
 					// resolve the promise to the url of the picture
@@ -211,6 +234,14 @@ export const getChosenGifUrl: (
 					// dispose of the webview
 					panel.dispose();
 					break;
+				case 'load-more':
+					// get the current page number
+					const currentPage = message.text;
+					const nextResults = await searchGif(searchTerm, currentPage + 1);
+					panel.webview.html =
+						nextResults.length < 10
+							? webviewHtml(createImages(nextResults))
+							: webviewHtml(createImages(nextResults), currentPage + 1, true);
 			}
 		}
 	);
@@ -222,8 +253,9 @@ export const getChosenGifUrl: (
  * @returns {vscode.WebviewPanel} a vscode webview panel
  */
 export const createGifSelectionPanel: (
-	searchResults: string[]
-) => vscode.WebviewPanel = searchResults => {
+	searchResults: string[],
+	page?: number
+) => vscode.WebviewPanel = (searchResults: string[], page = 1) => {
 	const images: string = createImages(searchResults);
 	const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
 		'gifSearch', // Identifies the type of the webview. Used internally
@@ -233,7 +265,10 @@ export const createGifSelectionPanel: (
 			enableScripts: true,
 		} // Webview options. authorizes js
 	);
-	panel.webview.html = webviewHtml(images);
+	panel.webview.html =
+		searchResults.length < 10
+			? webviewHtml(images)
+			: webviewHtml(images, page, true);
 	return panel;
 };
 
@@ -307,6 +342,7 @@ export const getLanguageCommentEnd = (languageId: String) => {
 		case 'css':
 			return ' */';
 		case 'html':
+		case 'markdown':
 			return ' -->';
 		default:
 			return '';
