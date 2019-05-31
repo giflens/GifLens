@@ -1,8 +1,14 @@
 {
 	"name": "giflens",
-	"displayName": "giflens",
+	"displayName": "Giflens",
 	"description": "Like Gitlens, but with GIFs",
-	"version": "0.0.1",
+	"version": "1.0.0",
+	"publisher": "giflens",
+	"icon": "docs/assets/giflens-icon.png",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/giflens/GifLens.git"
+	},
 	"engines": {
 		"vscode": "^1.30.0"
 	},
