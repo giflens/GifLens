@@ -4,6 +4,26 @@
 	"description": "Like Gitlens, but with GIFs",
 	"version": "1.0.0",
 	"publisher": "giflens",
+	"keywords": [
+		"gif",
+		"vscode",
+		"mbappe",
+		"game of thrones",
+		"lol",
+		"IDE",
+		"mdr",
+		"code",
+		"giphy"
+	],
+	"contributors": [
+		"Fabien Allanic",
+		"Maxime Burlat"
+	],
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/giflens/giflens/issues"
+	},
+	"homepage": "https://giflens.org",
 	"icon": "docs/assets/giflens-icon.png",
 	"repository": {
 		"type": "git",
