@@ -2,7 +2,7 @@
 	"name": "giflens",
 	"displayName": "Giflens",
 	"description": "Like Gitlens, but with GIFs",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "giflens",
 	"keywords": [
 		"gif",
@@ -120,6 +120,6 @@
 		"vscode": "^1.1.33"
 	},
 	"dependencies": {
-		"axios": "^0.18.0"
+		"axios": ">=0.19.0"
 	}
 }
