@@ -45,6 +45,11 @@
 				"command": "giflens.search",
 				"title": "Giflens Search",
 				"icon": "docs/assets/icons/search.svg"
+			},
+			{
+				"command": "giflens.addGif",
+				"title": "Giflens Add Gif",
+				"icon": "docs/assets/icons/search.svg"
 			}
 		],
 		"menus": {
@@ -53,6 +58,13 @@
 					"command": "giflens.search",
 					"when": "view == history",
 					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "giflens.addGif",
+					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
 				}
 			]
 		},

@@ -35,12 +35,14 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryEntry> {
 }
 
 export class HistoryEntry extends vscode.TreeItem {
-	constructor(
-		public readonly label: string,
-		public readonly gifUri: string,
-		public readonly command?: vscode.Command
-	) {
+	constructor(public readonly label: string, public readonly gifUri: string) {
 		super(label);
+		this.command = {
+			command: 'giflens.addGif',
+			title: 'Giflens Add Gif',
+			arguments: [gifUri],
+		};
+		this.contextValue = 'historyItem';
 	}
 
 	get tooltip(): string {

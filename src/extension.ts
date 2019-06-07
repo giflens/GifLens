@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 
 import searchHandler from './search';
 import { HistoryProvider } from './history';
+import { addGifLensTagToEditor } from './addGif';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -51,12 +52,12 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
-	// const addGifDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
-	// 	'giflens.addGif',
-	// 	(textEditor: vscode.TextEditor) => {
-	// 		addGifHandler(textEditor, context);
-	// 	}
-	// );
+	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.addGif',
+		(gifUri: string) => {
+			addGifLensTagToEditor(vscode.window.activeTextEditor, gifUri);
+		}
+	);
 
 	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
 		'history',
@@ -65,8 +66,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		searchDisposable,
-		historyTreeViewDisposable
-		// addGifDisposable
+		historyTreeViewDisposable,
+		addHistoryGifDisposable
 	);
 }
 
