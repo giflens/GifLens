@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 
 import searchHandler from './search';
+import { HistoryProvider } from './history';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -38,17 +39,24 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "giflens" is now active!');
 
+	const historyTreeView = new HistoryProvider(context.globalState);
+
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
+	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
 		'giflens.search',
 		(textEditor: vscode.TextEditor) => {
 			searchHandler(textEditor, context);
 		}
 	);
 
-	context.subscriptions.push(disposable);
+	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
+		'history',
+		historyTreeView
+	);
+
+	context.subscriptions.push(searchDisposable, historyTreeViewDisposable);
 }
 
 // this method is called when your extension is deactivated
