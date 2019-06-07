@@ -46,6 +46,27 @@
 				"title": "Giflens"
 			}
 		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "giflens",
+					"title": "Giflens",
+					"icon": "docs/assets/icons/bullhorn.svg"
+				}
+			]
+		},
+		"views": {
+			"giflens": [
+				{
+					"id": "history",
+					"name": "Search History"
+				},
+				{
+					"id": "favorites",
+					"name": "Favorites"
+				}
+			]
+		},
 		"grammars": [
 			{
 				"path": "./syntaxes/injection.json",
