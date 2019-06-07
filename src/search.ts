@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { searchGif } from './utils';
+import { HistoryProvider, HistoryEntry } from './history';
 
 /**
  * creates the html for the webview (boilerplate + img tags from the gif search)
@@ -82,17 +83,19 @@ const errorHtml = `<!DOCTYPE html>
  */
 export const search: (
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext
+	context: vscode.ExtensionContext,
+	history: HistoryProvider
 ) => Promise<boolean> = async (
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext
+	context: vscode.ExtensionContext,
+	history
 ) => {
 	// The code you place here will be executed every time your command is executed
 	const searchInput: string | undefined = await vscode.window.showInputBox({
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
-	const status = await searchTask(searchInput, editor);
+	const status = await searchTask(searchInput, editor, context, history);
 	return status;
 };
 
@@ -104,10 +107,14 @@ export const search: (
  */
 export const searchTask: (
 	searchInput: string | undefined,
-	editor: vscode.TextEditor
+	editor: vscode.TextEditor,
+	context: vscode.ExtensionContext,
+	history: HistoryProvider
 ) => Promise<boolean> = async (
 	searchInput: string | undefined,
-	editor: vscode.TextEditor
+	editor: vscode.TextEditor,
+	context: vscode.ExtensionContext,
+	history: HistoryProvider
 ) => {
 	// grabbing the current location to insert the edit later with the GIFLENS tag
 	const position: vscode.Position = editor.selection.active;
@@ -125,7 +132,7 @@ export const searchTask: (
 
 			// urlToUse is defined with a promise that will be resolved once a user clicks a GIF
 			const urlToUse: string = await new Promise(resolve =>
-				getChosenGifUrl(searchResults, resolve, searchInput)
+				getChosenGifUrl(searchResults, resolve, searchInput, context, history)
 			);
 
 			return addGifLensTagToEditor(editor, position, urlToUse);
@@ -217,8 +224,10 @@ export const createImages: (urls: string[]) => string = (urls: string[]) => {
 export const getChosenGifUrl: (
 	searchResults: string[],
 	resolve: Function,
-	searchTerm: string
-) => void = (searchResults, resolve, searchTerm) => {
+	searchTerm: string,
+	context: vscode.ExtensionContext,
+	history: HistoryProvider
+) => void = (searchResults, resolve, searchTerm, context, history) => {
 	// creates a webview panel
 	const panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
 
@@ -229,6 +238,21 @@ export const getChosenGifUrl: (
 				case 'url':
 					// resolve the promise to the url of the picture
 					resolve(message.text);
+					// update the global state with the new Search
+					const prevHistory:
+						| HistoryEntry[]
+						| undefined = context.globalState.get('history');
+					let nextHistory: HistoryEntry[] = [];
+					if (prevHistory) {
+						const newEntry: HistoryEntry = new HistoryEntry(
+							message.text,
+							message.text
+						);
+						nextHistory = prevHistory.concat([newEntry]);
+					}
+					context.globalState.update('history', nextHistory).then(() => {
+						history.refresh(context.globalState);
+					});
 					// dispose of the subscription to the webview messages
 					subscription.dispose();
 					// dispose of the webview

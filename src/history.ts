@@ -6,7 +6,7 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryEntry> {
 	> = new vscode.EventEmitter<HistoryEntry | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<HistoryEntry | undefined> = this
 		._onDidChangeTreeData.event;
-	private history: any[] | undefined;
+	private history: HistoryEntry[] | undefined;
 
 	constructor(globalState: vscode.Memento) {
 		this.history = globalState.get('history')

@@ -47,16 +47,27 @@ export function activate(context: vscode.ExtensionContext) {
 	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
 		'giflens.search',
 		(textEditor: vscode.TextEditor) => {
-			searchHandler(textEditor, context);
+			searchHandler(textEditor, context, historyTreeView);
 		}
 	);
+
+	// const addGifDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
+	// 	'giflens.addGif',
+	// 	(textEditor: vscode.TextEditor) => {
+	// 		addGifHandler(textEditor, context);
+	// 	}
+	// );
 
 	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
 		'history',
 		historyTreeView
 	);
 
-	context.subscriptions.push(searchDisposable, historyTreeViewDisposable);
+	context.subscriptions.push(
+		searchDisposable,
+		historyTreeViewDisposable
+		// addGifDisposable
+	);
 }
 
 // this method is called when your extension is deactivated
