@@ -42,10 +42,20 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "giflens",
-				"title": "Giflens"
+				"command": "giflens.search",
+				"title": "Giflens Search",
+				"icon": "docs/assets/icons/search.svg"
 			}
 		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "giflens.search",
+					"when": "view == history",
+					"group": "navigation"
+				}
+			]
+		},
 		"viewsContainers": {
 			"activitybar": [
 				{
