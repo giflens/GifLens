@@ -242,14 +242,13 @@ export const getChosenGifUrl: (
 					const prevHistory:
 						| HistoryEntry[]
 						| undefined = context.globalState.get('history');
-					let nextHistory: HistoryEntry[] = [];
-					if (prevHistory) {
-						const newEntry: HistoryEntry = new HistoryEntry(
-							message.text,
-							message.text
-						);
-						nextHistory = prevHistory.concat([newEntry]);
-					}
+					const newEntry: HistoryEntry = new HistoryEntry(
+						message.text,
+						message.text
+					);
+					const nextHistory = prevHistory
+						? prevHistory.concat([newEntry])
+						: [newEntry];
 					context.globalState.update('history', nextHistory).then(() => {
 						history.refresh(context.globalState);
 					});
