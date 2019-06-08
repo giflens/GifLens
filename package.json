@@ -48,14 +48,23 @@
 			},
 			{
 				"command": "giflens.addGif",
-				"title": "Giflens Add Gif",
-				"icon": "docs/assets/icons/search.svg"
+				"title": "Giflens Add Gif"
+			},
+			{
+				"command": "giflens.resetHistory",
+				"title": "Giflens Reset History",
+				"icon": "docs/assets/icons/trash-alt.svg"
 			}
 		],
 		"menus": {
 			"view/title": [
 				{
 					"command": "giflens.search",
+					"when": "view == history",
+					"group": "navigation"
+				},
+				{
+					"command": "giflens.resetHistory",
 					"when": "view == history",
 					"group": "navigation"
 				}

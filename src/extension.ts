@@ -59,6 +59,15 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	const resetHistoryDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.resetHistory',
+		() => {
+			context.globalState.update('history', undefined).then(() => {
+				historyTreeView.refresh(context.globalState);
+			});
+		}
+	);
+
 	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
 		'history',
 		historyTreeView
@@ -67,7 +76,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		searchDisposable,
 		historyTreeViewDisposable,
-		addHistoryGifDisposable
+		addHistoryGifDisposable,
+		resetHistoryDisposable
 	);
 }
 
