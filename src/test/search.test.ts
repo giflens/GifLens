@@ -10,10 +10,14 @@ import {
 
 suite('Search Webview', function() {
 	test('given a string array, createImages should return <img> html tags as one string', function() {
-		const createdString = createImages(['1', '2', '3']);
+		const createdString = createImages([
+			{ url: '1', label: '4' },
+			{ url: '2', label: '5' },
+			{ url: '3', label: '6' },
+		]);
 		assert(
 			createdString ===
-				'<img class="search-img" style="cursor: pointer;" src="1" /><img class="search-img" style="cursor: pointer;" src="2" /><img class="search-img" style="cursor: pointer;" src="3" />'
+				'<img class="search-img" style="cursor: pointer;" src="1" alt="4" /><img class="search-img" style="cursor: pointer;" src="2" alt="5" /><img class="search-img" style="cursor: pointer;" src="3" alt="6" />'
 		);
 	});
 

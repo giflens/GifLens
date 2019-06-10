@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { searchGif } from './utils';
+import { searchGif, Gif } from './utils';
 import { HistoryProvider, HistoryEntry } from './history';
 
 /**
@@ -35,16 +35,17 @@ export const webviewHtml: (
         var arr = [...searchImages];
 
         // event handler that sends back to the extension the url of the clicked gif
-        const sendUrl = event => {
-          const url = event.target.getAttribute('src');
+        const sendGif = event => {
+					const url = event.target.getAttribute('src');
+					const label = event.target.getAttribute('alt');
           vscode.postMessage({
             command: 'url',
-            text: url,
+            text: { url, label},
           });
         };
         
         // attaching the click listener to each image
-        arr.forEach(gifItem => {gifItem.addEventListener('click', sendUrl)})
+        arr.forEach(gifItem => {gifItem.addEventListener('click', sendGif)})
 
         // creating the load more action
         const loadMoreButton = document.getElementById('loadMore');
@@ -121,7 +122,7 @@ export const searchTask: (
 	if (searchInput) {
 		try {
 			// part about getting the data and creating the img html tags for the images.
-			const searchResults: string[] = await searchGif(searchInput);
+			const searchResults: Gif[] = await searchGif(searchInput);
 			// if the search did not return anything, send an information message to the user, and break
 			if (searchResults.length === 0) {
 				vscode.window.showInformationMessage(
@@ -131,7 +132,7 @@ export const searchTask: (
 			}
 
 			// urlToUse is defined with a promise that will be resolved once a user clicks a GIF
-			const urlToUse: string = await new Promise(resolve =>
+			const urlToUse: Gif = await new Promise(resolve =>
 				getChosenGifUrl(searchResults, resolve, searchInput, context, history)
 			);
 
@@ -154,14 +155,14 @@ export const searchTask: (
  * add a giflens tag with the specified url in the active editor
  * @param  {vscode.TextEditor} editor the active vscode editor
  * @param  {vscode.Position} position the position of the cursor in the active vscode editor
- * @param  {string} url the url of the gif for which to insert a GifLens Tag
+ * @param  {Gif} gif the url of the gif for which to insert a GifLens Tag
  * @returns {Thenable<boolean} a final status of the insertion
  */
 const addGifLensTagToEditor: (
 	editor: vscode.TextEditor,
 	position: vscode.Position,
-	url: string
-) => Thenable<boolean> = (editor, position, urlToUse) => {
+	url: Gif
+) => Thenable<boolean> = (editor, position, gif) => {
 	return editor.edit(editBuilder => {
 		// getting the position where to insert (beginning of the current line)
 		let positionToInsert = new vscode.Position(position.line, 0);
@@ -169,11 +170,9 @@ const addGifLensTagToEditor: (
 		if (editor.document.lineAt(position).isEmptyOrWhitespace) {
 			editBuilder.insert(
 				positionToInsert,
-				`${getLanguageCommentStart(
-					editor.document.languageId
-				)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-					editor.document.languageId
-				)}`
+				`${getLanguageCommentStart(editor.document.languageId)} GIFLENS-${
+					gif.url
+				}${getLanguageCommentEnd(editor.document.languageId)}`
 				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
 			);
 			// else second case when using it from a line of code, we insert a new line above
@@ -191,11 +190,9 @@ const addGifLensTagToEditor: (
 						? // returns the correct indentation character for the user
 						  ' '.repeat(lineBeginningChars)
 						: '\t'.repeat(lineBeginningChars)
-				}${getLanguageCommentStart(
-					editor.document.languageId
-				)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-					editor.document.languageId
-				)}\r`
+				}${getLanguageCommentStart(editor.document.languageId)} GIFLENS-${
+					gif.url
+				}${getLanguageCommentEnd(editor.document.languageId)}\r`
 				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
 			);
 		}
@@ -204,13 +201,16 @@ const addGifLensTagToEditor: (
 
 /**
  * creates img html tags from a set of gif urls (disposed one after the other)
- * @param  {string[]} urls an array of gif urls
+ * @param  {string[]} gifs an array of gif urls
  * @returns {string} html img tags as a string
  */
-export const createImages: (urls: string[]) => string = (urls: string[]) => {
-	return urls
+export const createImages: (gifs: Gif[]) => string = (gifs: Gif[]) => {
+	return gifs
 		.map(
-			url => `<img class="search-img" style="cursor: pointer;" src="${url}" />`
+			gif =>
+				`<img class="search-img" style="cursor: pointer;" src="${
+					gif.url
+				}" alt="${gif.label}" />`
 		)
 		.join('');
 };
@@ -222,7 +222,7 @@ export const createImages: (urls: string[]) => string = (urls: string[]) => {
  * @param  {Function} resolve
  */
 export const getChosenGifUrl: (
-	searchResults: string[],
+	searchResults: Gif[],
 	resolve: Function,
 	searchTerm: string,
 	context: vscode.ExtensionContext,
@@ -243,8 +243,8 @@ export const getChosenGifUrl: (
 						| HistoryEntry[]
 						| undefined = context.globalState.get('history');
 					const newEntry: HistoryEntry = new HistoryEntry(
-						message.text,
-						message.text
+						message.text.label,
+						message.text.url
 					);
 					const nextHistory = prevHistory
 						? prevHistory.concat([newEntry])
@@ -276,9 +276,9 @@ export const getChosenGifUrl: (
  * @returns {vscode.WebviewPanel} a vscode webview panel
  */
 export const createGifSelectionPanel: (
-	searchResults: string[],
+	searchResults: Gif[],
 	page?: number
-) => vscode.WebviewPanel = (searchResults: string[], page = 1) => {
+) => vscode.WebviewPanel = (searchResults: Gif[], page = 1) => {
 	const images: string = createImages(searchResults);
 	const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
 		'gifSearch', // Identifies the type of the webview. Used internally
