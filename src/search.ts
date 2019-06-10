@@ -246,9 +246,13 @@ export const getChosenGifUrl: (
 						message.text.label,
 						message.text.url
 					);
-					const nextHistory = prevHistory
-						? prevHistory.concat([newEntry])
-						: [newEntry];
+					const nextHistory =
+						// TODO: the 15 could be a setting
+						prevHistory && prevHistory.length < 15
+							? [newEntry].concat(prevHistory)
+							: prevHistory
+							? [newEntry].concat(prevHistory.slice(0, -1))
+							: [newEntry];
 					context.globalState.update('history', nextHistory).then(() => {
 						history.refresh(context.globalState);
 					});
