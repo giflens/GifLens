@@ -40,11 +40,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "giflens" is now active!');
 
+	// instantiate a history provider from the global state (extension permanent storage, works like a simple key value system)
 	const historyTreeView = new HistoryProvider(context.globalState);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
+	// register the search command
 	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
 		'giflens.search',
 		(textEditor: vscode.TextEditor) => {
@@ -52,6 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	// register the add a GIFLENS tag command
 	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.addGif',
 		(gifUri: string, editor?: vscode.TextEditor) => {
@@ -66,6 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	// register the reset history command
 	const resetHistoryDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.resetHistory',
 		() => {
@@ -75,6 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	// register the tree provider for history
 	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
 		'history',
 		historyTreeView

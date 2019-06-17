@@ -80,6 +80,7 @@ const errorHtml = `<!DOCTYPE html>
  * @param  {vscode.TextEditor} editor the active vsCode editor at the time the command is run
  * @param  {vscode.ExtensionContext} context the context of the extension
  * TODO: use the context to be able to store the failure gif inside the extension, rather than fetching it on the internet
+ * @param {HistoryProvider} history the history provider, used to store new search entries
  * @returns a Promise to a boolean, indicating the final status
  */
 export const search: (
@@ -104,6 +105,8 @@ export const search: (
  * handle the gif search, selection and edition of the editor (controller)
  * @param  {string|undefined} searchInput the string entered by the user to launch the gif search
  * @param  {vscode.TextEditor} editor the current active editor
+ * @param  {vscode.ExtensionContext} context the context of the extension (useful to access global state)
+ * @param  {HistoryProvider} history the history provider, used to store new search entries
  * @returns {Promise<boolean>} the status of the tast, true for completed, false for failure
  */
 export const searchTask: (
