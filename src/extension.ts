@@ -54,8 +54,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.addGif',
-		(gifUri: string) => {
-			addGifLensTagToEditor(vscode.window.activeTextEditor, gifUri);
+		(gifUri: string, editor?: vscode.TextEditor) => {
+			debugger;
+			if (vscode.window.activeTextEditor) {
+				addGifLensTagToEditor(vscode.window.activeTextEditor, gifUri);
+			} else if (editor) {
+				addGifLensTagToEditor(editor, gifUri);
+			} else {
+				throw new Error('no active text editor');
+			}
 		}
 	);
 

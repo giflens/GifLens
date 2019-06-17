@@ -3,8 +3,6 @@ import * as assert from 'assert';
 
 import {
 	createImages,
-	getLanguageCommentEnd,
-	getLanguageCommentStart,
 	// searchTask,
 } from '../search';
 
@@ -19,16 +17,6 @@ suite('Search Webview', function() {
 			createdString ===
 				'<img class="search-img" style="cursor: pointer;" src="1" alt="4" /><img class="search-img" style="cursor: pointer;" src="2" alt="5" /><img class="search-img" style="cursor: pointer;" src="3" alt="6" />'
 		);
-	});
-
-	test('given a correct language identifier, getLanguageCommentStart should return the correct comment start', function() {
-		const commentStart = getLanguageCommentStart('c');
-		assert(commentStart === '/*');
-	});
-
-	test('given a correct language identifier, getLanguageCommentEnd should return the correct comment end', function() {
-		const commentEnd = getLanguageCommentEnd('css');
-		assert(commentEnd === ' */');
 	});
 
 	// test('given the user did not enter any search term, searchTask should return false', async function() {
