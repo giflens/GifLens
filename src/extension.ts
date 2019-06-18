@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 
 import searchHandler from './search';
-import { HistoryProvider } from './history';
+import { HistoryProvider, HistoryEntry } from './history';
 import { addGifLensTagToEditor } from './addGif';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
@@ -54,12 +54,17 @@ export function activate(context: vscode.ExtensionContext) {
 	// register the add a GIFLENS tag command
 	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.addGif',
-		(gifUri: string, editor?: vscode.TextEditor) => {
-			debugger;
+		(gifUri: HistoryEntry | string, editor?: vscode.TextEditor) => {
 			if (vscode.window.activeTextEditor) {
-				addGifLensTagToEditor(vscode.window.activeTextEditor, gifUri);
+				addGifLensTagToEditor(
+					vscode.window.activeTextEditor,
+					typeof gifUri === 'string' ? gifUri : gifUri.gifUri
+				);
 			} else if (editor) {
-				addGifLensTagToEditor(editor, gifUri);
+				addGifLensTagToEditor(
+					editor,
+					typeof gifUri === 'string' ? gifUri : gifUri.gifUri
+				);
 			} else {
 				throw new Error('no active text editor');
 			}

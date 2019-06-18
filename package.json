@@ -48,12 +48,16 @@
 			},
 			{
 				"command": "giflens.addGif",
-				"title": "Giflens Add Gif"
+				"title": "Add Tag"
 			},
 			{
 				"command": "giflens.resetHistory",
 				"title": "Giflens Reset History",
 				"icon": "docs/assets/icons/trash-alt.svg"
+			},
+			{
+				"command": "giflens.deleteGif",
+				"title": "Remove"
 			}
 		],
 		"menus": {
@@ -72,6 +76,11 @@
 			"view/item/context": [
 				{
 					"command": "giflens.addGif",
+					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
+				},
+				{
+					"command": "giflens.deleteGif",
 					"when": "view == history && viewItem == historyItem",
 					"group": "inline"
 				}
