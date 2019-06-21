@@ -13,6 +13,7 @@ const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?
 
 // https://github.com/Microsoft/vscode-go/blob/86605f89ca43c865f511afb1d464a35eb8c8733e/src/goDeclaration.ts#L70-L82
 
+// this is the function to provide the GIF hover on GIFLENS tags
 vscode.languages.registerHoverProvider('*', {
 	provideHover(
 		document: vscode.TextDocument,
@@ -72,6 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	// register the delete a Gif from history command
 	const deleteHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.deleteGif',
 		(gif: HistoryEntry) => {

@@ -1,6 +1,11 @@
 import * as vscode from 'vscode';
 import { HistoryEntry, HistoryProvider } from './history';
-
+/**
+ * deletes a gif from the history (all occurences)
+ * @param  {HistoryEntry} gif the gif to delete from the history
+ * @param  {vscode.Memento} state the state holder in which to get the current history to modify it
+ * @param  {HistoryProvider} historyTreeView the history tree view that is linked to the history menu, that needs to be refreshed for the change to appear to the user
+ */
 export const deleteGifFromHistory: (
 	gif: HistoryEntry,
 	state: vscode.Memento,
