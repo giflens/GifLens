@@ -44,20 +44,34 @@
 			{
 				"command": "giflens.search",
 				"title": "Giflens Search",
-				"icon": "docs/assets/icons/search.svg"
+				"icon": {
+					"dark": "docs/assets/icons/dark-search.svg",
+					"light": "docs/assets/icons/light-search.svg"
+				}
 			},
 			{
 				"command": "giflens.addGif",
-				"title": "Add Tag"
+				"title": "Add Tag",
+				"icon": {
+					"dark": "docs/assets/icons/dark-plus.svg",
+					"light": "docs/assets/icons/light-plus.svg"
+				}
 			},
 			{
 				"command": "giflens.resetHistory",
 				"title": "Giflens Reset History",
-				"icon": "docs/assets/icons/trash-alt.svg"
+				"icon": {
+					"dark": "docs/assets/icons/dark-trash-alt.svg",
+					"light": "docs/assets/icons/light-trash-alt.svg"
+				}
 			},
 			{
 				"command": "giflens.deleteGif",
-				"title": "Remove"
+				"title": "Remove",
+				"icon": {
+					"dark": "docs/assets/icons/dark-trash-alt.svg",
+					"light": "docs/assets/icons/light-trash-alt.svg"
+				}
 			}
 		],
 		"menus": {
@@ -91,7 +105,7 @@
 				{
 					"id": "giflens",
 					"title": "Giflens",
-					"icon": "docs/assets/icons/bullhorn.svg"
+					"icon": "docs/assets/icons/activity-bar.svg"
 				}
 			]
 		},
