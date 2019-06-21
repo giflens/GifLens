@@ -75,7 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const deleteHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.deleteGif',
 		(gif: HistoryEntry) => {
-			deleteGifFromHistory(gif, context, historyTreeView);
+			deleteGifFromHistory(gif, context.globalState, historyTreeView);
 		}
 	);
 
