@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
 		'giflens.search',
 		(textEditor: vscode.TextEditor) => {
-			searchHandler(textEditor, context, historyTreeView);
+			searchHandler(textEditor, context.globalState, historyTreeView);
 		}
 	);
 
@@ -104,6 +104,9 @@ export function activate(context: vscode.ExtensionContext) {
 		deleteHistoryGifDisposable,
 		resetHistoryDisposable
 	);
+
+	let api = { state: context.globalState };
+	return api;
 }
 
 // this method is called when your extension is deactivated

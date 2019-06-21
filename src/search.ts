@@ -78,18 +78,18 @@ const errorHtml = `<!DOCTYPE html>
 /**
  * handler for the search TextEditorCommand
  * @param  {vscode.TextEditor} editor the active vsCode editor at the time the command is run
- * @param  {vscode.ExtensionContext} context the context of the extension
+ * @param  {vscode.ExtensionContext} state the context of the extension
  * TODO: use the context to be able to store the failure gif inside the extension, rather than fetching it on the internet
  * @param {HistoryProvider} history the history provider, used to store new search entries
  * @returns a Promise to a boolean, indicating the final status
  */
 export const search: (
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext,
+	state: vscode.Memento,
 	history: HistoryProvider
 ) => Promise<boolean | undefined> = async (
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext,
+	state: vscode.Memento,
 	history
 ) => {
 	// The code you place here will be executed every time your command is executed
@@ -97,7 +97,7 @@ export const search: (
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
-	const status = await searchTask(searchInput, editor, context, history);
+	const status = await searchTask(searchInput, editor, state, history);
 	return status;
 };
 
@@ -105,19 +105,19 @@ export const search: (
  * handle the gif search, selection and edition of the editor (controller)
  * @param  {string|undefined} searchInput the string entered by the user to launch the gif search
  * @param  {vscode.TextEditor} editor the current active editor
- * @param  {vscode.ExtensionContext} context the context of the extension (useful to access global state)
+ * @param  {vscode.ExtensionContext} state the context of the extension (useful to access global state)
  * @param  {HistoryProvider} history the history provider, used to store new search entries
  * @returns {Promise<boolean>} the status of the tast, true for completed, false for failure
  */
 export const searchTask: (
 	searchInput: string | undefined,
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext,
+	state: vscode.Memento,
 	history: HistoryProvider
 ) => Promise<boolean | undefined> = async (
 	searchInput: string | undefined,
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext,
+	state: vscode.Memento,
 	history: HistoryProvider
 ) => {
 	if (searchInput) {
@@ -134,7 +134,7 @@ export const searchTask: (
 
 			// urlToUse is defined with a promise that will be resolved once a user clicks a GIF
 			const urlToUse: Gif = await new Promise(resolve =>
-				getChosenGifUrl(searchResults, resolve, searchInput, context, history)
+				getChosenGifUrl(searchResults, resolve, searchInput, state, history)
 			);
 
 			return vscode.commands.executeCommand(
@@ -182,9 +182,9 @@ export const getChosenGifUrl: (
 	searchResults: Gif[],
 	resolve: Function,
 	searchTerm: string,
-	context: vscode.ExtensionContext,
+	state: vscode.Memento,
 	history: HistoryProvider
-) => void = (searchResults, resolve, searchTerm, context, history) => {
+) => void = (searchResults, resolve, searchTerm, state, history) => {
 	// creates a webview panel
 	const panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
 
@@ -196,9 +196,7 @@ export const getChosenGifUrl: (
 					// resolve the promise to the url of the picture
 					resolve(message.text);
 					// update the global state with the new Search
-					const prevHistory:
-						| HistoryEntry[]
-						| undefined = context.globalState.get('history');
+					const prevHistory: HistoryEntry[] | undefined = state.get('history');
 					const newEntry: HistoryEntry = new HistoryEntry(
 						message.text.label,
 						message.text.url
@@ -210,8 +208,8 @@ export const getChosenGifUrl: (
 							: prevHistory
 							? [newEntry].concat(prevHistory.slice(0, -1))
 							: [newEntry];
-					context.globalState.update('history', nextHistory).then(() => {
-						history.refresh(context.globalState);
+					state.update('history', nextHistory).then(() => {
+						history.refresh(state);
 					});
 					// dispose of the subscription to the webview messages
 					subscription.dispose();

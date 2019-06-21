@@ -1,10 +1,12 @@
 import * as assert from 'assert';
-// import * as vscode from 'vscode';
+import * as vscode from 'vscode';
 
 import {
 	createImages,
+	searchTask,
 	// searchTask,
 } from '../search';
+import { HistoryProvider } from '../history';
 
 suite('Search Webview', function() {
 	test('given a string array, createImages should return <img> html tags as one string', function() {
@@ -19,17 +21,29 @@ suite('Search Webview', function() {
 		);
 	});
 
-	// test('given the user did not enter any search term, searchTask should return false', async function() {
-	// 	// opens a new unnamed document and show it to have a textEditor to work with
-	// 	const newEditor: vscode.TextEditor = await vscode.workspace
-	// 		.openTextDocument({ content: 'for running tests' })
-	// 		.then(document => {
-	// 			return vscode.window.showTextDocument(document);
-	// 		});
+	test('given the user did not enter any search term, searchTask should return false', async function() {
+		// opens a new unnamed document and show it to have a textEditor to work with
+		const newEditor: vscode.TextEditor = await vscode.workspace
+			.openTextDocument({ content: 'for running tests' })
+			.then(document => {
+				return vscode.window.showTextDocument(document);
+			});
 
-	// 	const status = await searchTask(undefined, newEditor);
-	// 	assert(status === false);
-	// });
+		const giflens = vscode.extensions.getExtension('giflens.giflens');
+		if (giflens) {
+			const tempHistory = new HistoryProvider(giflens.exports.state);
+
+			const status = await searchTask(
+				undefined,
+				newEditor,
+				giflens.exports.state,
+				tempHistory
+			);
+			assert(status === false);
+		} else {
+			assert(false);
+		}
+	});
 
 	test('[NOT IMPLEMENTED] given the user enters a correct term, searchTask should return true once the user picks an image in the webview', function() {
 		assert(true);
