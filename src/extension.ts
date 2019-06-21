@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import searchHandler from './search';
 import { HistoryProvider, HistoryEntry } from './history';
 import { addGifLensTagToEditor } from './addGif';
+import { deleteGifFromHistory } from './deleteGif';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -71,6 +72,13 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	const deleteHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.deleteGif',
+		(gif: HistoryEntry) => {
+			deleteGifFromHistory(gif, context, historyTreeView);
+		}
+	);
+
 	// register the reset history command
 	const resetHistoryDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.resetHistory',
@@ -91,6 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
 		searchDisposable,
 		historyTreeViewDisposable,
 		addHistoryGifDisposable,
+		deleteHistoryGifDisposable,
 		resetHistoryDisposable
 	);
 }
