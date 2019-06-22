@@ -42,10 +42,81 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "giflens",
-				"title": "Giflens"
+				"command": "giflens.search",
+				"title": "Giflens Search",
+				"icon": {
+					"dark": "docs/assets/icons/dark-search.svg",
+					"light": "docs/assets/icons/light-search.svg"
+				}
+			},
+			{
+				"command": "giflens.addGif",
+				"title": "Insert Gif",
+				"icon": {
+					"dark": "docs/assets/icons/dark-plus.svg",
+					"light": "docs/assets/icons/light-plus.svg"
+				}
+			},
+			{
+				"command": "giflens.resetHistory",
+				"title": "Reset Giflens History",
+				"icon": {
+					"dark": "docs/assets/icons/dark-trash-alt.svg",
+					"light": "docs/assets/icons/light-trash-alt.svg"
+				}
+			},
+			{
+				"command": "giflens.deleteGif",
+				"title": "Remove from History",
+				"icon": {
+					"dark": "docs/assets/icons/dark-trash-alt.svg",
+					"light": "docs/assets/icons/light-trash-alt.svg"
+				}
 			}
 		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "giflens.search",
+					"when": "view == history",
+					"group": "navigation"
+				},
+				{
+					"command": "giflens.resetHistory",
+					"when": "view == history",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "giflens.addGif",
+					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
+				},
+				{
+					"command": "giflens.deleteGif",
+					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
+				}
+			]
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "giflens",
+					"title": "Giflens",
+					"icon": "docs/assets/icons/activity-bar.svg"
+				}
+			]
+		},
+		"views": {
+			"giflens": [
+				{
+					"id": "history",
+					"name": "Search History"
+				}
+			]
+		},
 		"grammars": [
 			{
 				"path": "./syntaxes/injection.json",

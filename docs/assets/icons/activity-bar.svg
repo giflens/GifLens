@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+    <ellipse cx="320" cy="320" fill="none" stroke="black" stroke-width="50" rx="240" ry="240"/>
+    <text x="160" y="400" class="logoName">
+        GIF
+    </text>
+    <style>
+        .logoName { font: 190px sans-serif; font-weight: 800;}
+    </style>
+</svg>

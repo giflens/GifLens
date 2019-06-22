@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
-import { searchGif } from './utils';
+import { searchGif, Gif } from './utils';
+import { HistoryProvider, HistoryEntry } from './history';
 
 /**
  * creates the html for the webview (boilerplate + img tags from the gif search)
@@ -34,16 +35,17 @@ export const webviewHtml: (
         var arr = [...searchImages];
 
         // event handler that sends back to the extension the url of the clicked gif
-        const sendUrl = event => {
-          const url = event.target.getAttribute('src');
+        const sendGif = event => {
+					const url = event.target.getAttribute('src');
+					const label = event.target.getAttribute('alt');
           vscode.postMessage({
             command: 'url',
-            text: url,
+            text: { url, label},
           });
         };
         
         // attaching the click listener to each image
-        arr.forEach(gifItem => {gifItem.addEventListener('click', sendUrl)})
+        arr.forEach(gifItem => {gifItem.addEventListener('click', sendGif)})
 
         // creating the load more action
         const loadMoreButton = document.getElementById('loadMore');
@@ -76,23 +78,26 @@ const errorHtml = `<!DOCTYPE html>
 /**
  * handler for the search TextEditorCommand
  * @param  {vscode.TextEditor} editor the active vsCode editor at the time the command is run
- * @param  {vscode.ExtensionContext} context the context of the extension
+ * @param  {vscode.ExtensionContext} state the context of the extension
  * TODO: use the context to be able to store the failure gif inside the extension, rather than fetching it on the internet
+ * @param {HistoryProvider} history the history provider, used to store new search entries
  * @returns a Promise to a boolean, indicating the final status
  */
 export const search: (
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext
-) => Promise<boolean> = async (
+	state: vscode.Memento,
+	history: HistoryProvider
+) => Promise<boolean | undefined> = async (
 	editor: vscode.TextEditor,
-	context: vscode.ExtensionContext
+	state: vscode.Memento,
+	history
 ) => {
 	// The code you place here will be executed every time your command is executed
 	const searchInput: string | undefined = await vscode.window.showInputBox({
 		placeHolder: 'your gif search',
 		prompt: 'Enter your search, and press Enter',
 	});
-	const status = await searchTask(searchInput, editor);
+	const status = await searchTask(searchInput, editor, state, history);
 	return status;
 };
 
@@ -100,21 +105,25 @@ export const search: (
  * handle the gif search, selection and edition of the editor (controller)
  * @param  {string|undefined} searchInput the string entered by the user to launch the gif search
  * @param  {vscode.TextEditor} editor the current active editor
+ * @param  {vscode.Memento} state the context of the extension (useful to access global state)
+ * @param  {HistoryProvider} history the history provider, used to store new search entries
  * @returns {Promise<boolean>} the status of the tast, true for completed, false for failure
  */
 export const searchTask: (
 	searchInput: string | undefined,
-	editor: vscode.TextEditor
-) => Promise<boolean> = async (
+	editor: vscode.TextEditor,
+	state: vscode.Memento,
+	history: HistoryProvider
+) => Promise<boolean | undefined> = async (
 	searchInput: string | undefined,
-	editor: vscode.TextEditor
+	editor: vscode.TextEditor,
+	state: vscode.Memento,
+	history: HistoryProvider
 ) => {
-	// grabbing the current location to insert the edit later with the GIFLENS tag
-	const position: vscode.Position = editor.selection.active;
 	if (searchInput) {
 		try {
 			// part about getting the data and creating the img html tags for the images.
-			const searchResults: string[] = await searchGif(searchInput);
+			const searchResults: Gif[] = await searchGif(searchInput);
 			// if the search did not return anything, send an information message to the user, and break
 			if (searchResults.length === 0) {
 				vscode.window.showInformationMessage(
@@ -124,11 +133,15 @@ export const searchTask: (
 			}
 
 			// urlToUse is defined with a promise that will be resolved once a user clicks a GIF
-			const urlToUse: string = await new Promise(resolve =>
-				getChosenGifUrl(searchResults, resolve, searchInput)
+			const urlToUse: Gif = await new Promise(resolve =>
+				getChosenGifUrl(searchResults, resolve, searchInput, state, history)
 			);
 
-			return addGifLensTagToEditor(editor, position, urlToUse);
+			return vscode.commands.executeCommand(
+				'giflens.addGif',
+				urlToUse.url,
+				editor
+			);
 		} catch (err) {
 			// if an error is returned from the search, calls the handleAPIError function
 			return handleApiError(err);
@@ -144,66 +157,17 @@ export const searchTask: (
 };
 
 /**
- * add a giflens tag with the specified url in the active editor
- * @param  {vscode.TextEditor} editor the active vscode editor
- * @param  {vscode.Position} position the position of the cursor in the active vscode editor
- * @param  {string} url the url of the gif for which to insert a GifLens Tag
- * @returns {Thenable<boolean} a final status of the insertion
- */
-const addGifLensTagToEditor: (
-	editor: vscode.TextEditor,
-	position: vscode.Position,
-	url: string
-) => Thenable<boolean> = (editor, position, urlToUse) => {
-	return editor.edit(editBuilder => {
-		// getting the position where to insert (beginning of the current line)
-		let positionToInsert = new vscode.Position(position.line, 0);
-		// first case when the selected line is empty, we do not create a new line
-		if (editor.document.lineAt(position).isEmptyOrWhitespace) {
-			editBuilder.insert(
-				positionToInsert,
-				`${getLanguageCommentStart(
-					editor.document.languageId
-				)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-					editor.document.languageId
-				)}`
-				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
-			);
-			// else second case when using it from a line of code, we insert a new line above
-		} else {
-			// getting the number of spaces or tabs at the beginning of the line
-			const lineBeginningChars: number = editor.document.lineAt(position)
-				.firstNonWhitespaceCharacterIndex;
-			// goes to the beginning of the line to create the GIFLENS tag the line above after insertion
-			editBuilder.insert(
-				positionToInsert,
-				`${
-					// insertSpaces returns false if the user uses tabs, true if the user uses spaces
-					// it is defined per document in VSCode, so if the user voluntarily changes it on one line, this code will not work
-					editor.options.insertSpaces
-						? // returns the correct indentation character for the user
-						  ' '.repeat(lineBeginningChars)
-						: '\t'.repeat(lineBeginningChars)
-				}${getLanguageCommentStart(
-					editor.document.languageId
-				)} GIFLENS-${urlToUse}${getLanguageCommentEnd(
-					editor.document.languageId
-				)}\r`
-				// \r is used to create a new line, VSCode converts automatically to the end of line of the current OS
-			);
-		}
-	});
-};
-
-/**
  * creates img html tags from a set of gif urls (disposed one after the other)
- * @param  {string[]} urls an array of gif urls
+ * @param  {string[]} gifs an array of gif urls
  * @returns {string} html img tags as a string
  */
-export const createImages: (urls: string[]) => string = (urls: string[]) => {
-	return urls
+export const createImages: (gifs: Gif[]) => string = (gifs: Gif[]) => {
+	return gifs
 		.map(
-			url => `<img class="search-img" style="cursor: pointer;" src="${url}" />`
+			gif =>
+				`<img class="search-img" style="cursor: pointer;" src="${
+					gif.url
+				}" alt="${gif.label}" />`
 		)
 		.join('');
 };
@@ -215,10 +179,12 @@ export const createImages: (urls: string[]) => string = (urls: string[]) => {
  * @param  {Function} resolve
  */
 export const getChosenGifUrl: (
-	searchResults: string[],
+	searchResults: Gif[],
 	resolve: Function,
-	searchTerm: string
-) => void = (searchResults, resolve, searchTerm) => {
+	searchTerm: string,
+	state: vscode.Memento,
+	history: HistoryProvider
+) => void = (searchResults, resolve, searchTerm, state, history) => {
 	// creates a webview panel
 	const panel: vscode.WebviewPanel = createGifSelectionPanel(searchResults);
 
@@ -229,6 +195,20 @@ export const getChosenGifUrl: (
 				case 'url':
 					// resolve the promise to the url of the picture
 					resolve(message.text);
+					// update the global state with the new Search
+					const prevHistory: HistoryEntry[] | undefined = state.get('history');
+					const newEntry: HistoryEntry = new HistoryEntry(
+						message.text.label,
+						message.text.url
+					);
+					// TODO: the 15 could be a setting
+					const nextHistory = [newEntry].concat(prevHistory || []);
+					if (nextHistory.length > 15) {
+						nextHistory.pop();
+					}
+					state.update('history', nextHistory).then(() => {
+						history.refresh(state);
+					});
 					// dispose of the subscription to the webview messages
 					subscription.dispose();
 					// dispose of the webview
@@ -253,9 +233,9 @@ export const getChosenGifUrl: (
  * @returns {vscode.WebviewPanel} a vscode webview panel
  */
 export const createGifSelectionPanel: (
-	searchResults: string[],
+	searchResults: Gif[],
 	page?: number
-) => vscode.WebviewPanel = (searchResults: string[], page = 1) => {
+) => vscode.WebviewPanel = (searchResults: Gif[], page = 1) => {
 	const images: string = createImages(searchResults);
 	const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
 		'gifSearch', // Identifies the type of the webview. Used internally
@@ -270,83 +250,6 @@ export const createGifSelectionPanel: (
 			? webviewHtml(images)
 			: webviewHtml(images, page, true);
 	return panel;
-};
-
-/**
- * The syntax to open a comment for a specific language.
- * @param languageId The languageId (handled by VS code).
- * @returns A String to open a comment.
- */
-export const getLanguageCommentStart = (languageId: String) => {
-	switch (languageId) {
-		case 'bat':
-			return 'REM';
-		case 'clojure':
-			return ';';
-		case 'ruby':
-		case 'coffeescript':
-		case 'dockerfile':
-		case 'makefile':
-		case 'perl':
-		case 'powershell':
-		case 'python':
-		case 'r':
-		case 'shellscript':
-		case 'yaml':
-			return '#';
-		case 'c':
-		case 'css':
-			return '/*';
-		case 'html':
-		case 'markdown':
-			return '<!--';
-		case 'lua':
-		case 'sql':
-			return '--';
-		case 'swift':
-			return '///';
-		case 'vb':
-			return "'";
-		case 'javascript':
-		case 'typescript':
-		case 'cpp':
-		case 'csharp':
-		case 'fsharp':
-		case 'go':
-		case 'groovy':
-		case 'java':
-		case 'javascriptreact':
-		case 'less':
-		case 'objective-c':
-		case 'objective-cpp':
-		case 'php':
-		case 'jade':
-		case 'rust':
-		case 'scss':
-		case 'sass':
-		case 'typescriptreact':
-		default:
-			return '//';
-	}
-};
-
-/**
- * The (optional) closing comment syntax for the language.
- * All the results need to start with a space!
- * @param languageId The languageId (handled by VS code).
- * @returns A String, mepty for most cases.
- */
-export const getLanguageCommentEnd = (languageId: String) => {
-	switch (languageId) {
-		case 'c':
-		case 'css':
-			return ' */';
-		case 'html':
-		case 'markdown':
-			return ' -->';
-		default:
-			return '';
-	}
 };
 
 /**

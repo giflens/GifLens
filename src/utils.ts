@@ -11,16 +11,22 @@ export const searchGif = async (
 	searchTerms: string,
 	pageNumber = 1,
 	limit = 10
-): Promise<string[]> => {
+): Promise<Gif[]> => {
 	const url = `https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(
 		searchTerms
 	)}&api_key=${GIPHY_API_KEY}&offset=${(pageNumber - 1) *
 		limit}&limit=${limit}`;
 
 	const response = await axios.get(url);
-	const data = response.data.data.map(
-		(imageObject: any) => imageObject.images.fixed_height.url
-	);
+	const data = response.data.data.map((imageObject: any) => ({
+		url: imageObject.images.fixed_height.url,
+		label: imageObject.title,
+	}));
 
 	return data;
+};
+
+export type Gif = {
+	url: string;
+	label?: string;
 };

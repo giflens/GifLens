@@ -3,6 +3,9 @@
 import * as vscode from 'vscode';
 
 import searchHandler from './search';
+import { HistoryProvider, HistoryEntry } from './history';
+import { addGifLensTagToEditor } from './addGif';
+import { deleteGifFromHistory } from './deleteGif';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -10,6 +13,7 @@ const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?
 
 // https://github.com/Microsoft/vscode-go/blob/86605f89ca43c865f511afb1d464a35eb8c8733e/src/goDeclaration.ts#L70-L82
 
+// this is the function to provide the GIF hover on GIFLENS tags
 vscode.languages.registerHoverProvider('*', {
 	provideHover(
 		document: vscode.TextDocument,
@@ -38,17 +42,72 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "giflens" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
-		'giflens',
+	// instantiate a history provider from the global state (extension permanent storage, works like a simple key value system)
+	const historyTreeView = new HistoryProvider(context.globalState);
+
+	// register the search command
+	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
+		'giflens.search',
 		(textEditor: vscode.TextEditor) => {
-			searchHandler(textEditor, context);
+			searchHandler(textEditor, context.globalState, historyTreeView);
 		}
 	);
 
-	context.subscriptions.push(disposable);
+	// register the add a GIFLENS tag command
+	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.addGif',
+		(gifUri: HistoryEntry | string, editor?: vscode.TextEditor) => {
+			if (editor) {
+				addGifLensTagToEditor(
+					editor,
+					typeof gifUri === 'string' ? gifUri : gifUri.gifUri
+				);
+			} else if (vscode.window.activeTextEditor) {
+				addGifLensTagToEditor(
+					vscode.window.activeTextEditor,
+					typeof gifUri === 'string' ? gifUri : gifUri.gifUri
+				);
+			} else {
+				throw new Error('no active text editor');
+			}
+		}
+	);
+
+	// register the delete a Gif from history command
+	const deleteHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.deleteGif',
+		(gif: HistoryEntry) => {
+			deleteGifFromHistory(gif, context.globalState, historyTreeView);
+		}
+	);
+
+	// register the reset history command
+	const resetHistoryDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.resetHistory',
+		() => {
+			// there is no delete interface on global state, undefined is passed to remove a key
+			context.globalState.update('history', undefined).then(() => {
+				historyTreeView.refresh(context.globalState);
+			});
+		}
+	);
+
+	// register the tree provider for history
+	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
+		'history',
+		historyTreeView
+	);
+
+	context.subscriptions.push(
+		searchDisposable,
+		historyTreeViewDisposable,
+		addHistoryGifDisposable,
+		deleteHistoryGifDisposable,
+		resetHistoryDisposable
+	);
+
+	let api = { state: context.globalState };
+	return api;
 }
 
 // this method is called when your extension is deactivated
