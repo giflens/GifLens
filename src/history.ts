@@ -21,7 +21,6 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryEntry> {
 	}
 
 	getTreeItem(element: HistoryEntry): vscode.TreeItem {
-		element.tooltip = `${element.gifUri}`;
 		return element;
 	}
 
