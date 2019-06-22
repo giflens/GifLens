@@ -57,14 +57,14 @@ export function activate(context: vscode.ExtensionContext) {
 	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.addGif',
 		(gifUri: HistoryEntry | string, editor?: vscode.TextEditor) => {
-			if (vscode.window.activeTextEditor) {
-				addGifLensTagToEditor(
-					vscode.window.activeTextEditor,
-					typeof gifUri === 'string' ? gifUri : gifUri.gifUri
-				);
-			} else if (editor) {
+			if (editor) {
 				addGifLensTagToEditor(
 					editor,
+					typeof gifUri === 'string' ? gifUri : gifUri.gifUri
+				);
+			} else if (vscode.window.activeTextEditor) {
+				addGifLensTagToEditor(
+					vscode.window.activeTextEditor,
 					typeof gifUri === 'string' ? gifUri : gifUri.gifUri
 				);
 			} else {
