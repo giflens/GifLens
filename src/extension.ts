@@ -85,6 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const resetHistoryDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.resetHistory',
 		() => {
+			// there is no delete interface on global state, undefined is passed to remove a key
 			context.globalState.update('history', undefined).then(() => {
 				historyTreeView.refresh(context.globalState);
 			});

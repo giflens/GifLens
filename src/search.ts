@@ -105,7 +105,7 @@ export const search: (
  * handle the gif search, selection and edition of the editor (controller)
  * @param  {string|undefined} searchInput the string entered by the user to launch the gif search
  * @param  {vscode.TextEditor} editor the current active editor
- * @param  {vscode.ExtensionContext} state the context of the extension (useful to access global state)
+ * @param  {vscode.Memento} state the context of the extension (useful to access global state)
  * @param  {HistoryProvider} history the history provider, used to store new search entries
  * @returns {Promise<boolean>} the status of the tast, true for completed, false for failure
  */
@@ -201,13 +201,11 @@ export const getChosenGifUrl: (
 						message.text.label,
 						message.text.url
 					);
-					const nextHistory =
-						// TODO: the 15 could be a setting
-						prevHistory && prevHistory.length < 15
-							? [newEntry].concat(prevHistory)
-							: prevHistory
-							? [newEntry].concat(prevHistory.slice(0, -1))
-							: [newEntry];
+					// TODO: the 15 could be a setting
+					const nextHistory = [newEntry].concat(prevHistory || []);
+					if (nextHistory.length > 15) {
+						nextHistory.pop();
+					}
 					state.update('history', nextHistory).then(() => {
 						history.refresh(state);
 					});

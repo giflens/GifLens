@@ -51,7 +51,7 @@
 			},
 			{
 				"command": "giflens.addGif",
-				"title": "Add Tag",
+				"title": "Insert Gif",
 				"icon": {
 					"dark": "docs/assets/icons/dark-plus.svg",
 					"light": "docs/assets/icons/light-plus.svg"
@@ -59,7 +59,7 @@
 			},
 			{
 				"command": "giflens.resetHistory",
-				"title": "Giflens Reset History",
+				"title": "Reset Giflens History",
 				"icon": {
 					"dark": "docs/assets/icons/dark-trash-alt.svg",
 					"light": "docs/assets/icons/light-trash-alt.svg"
@@ -67,7 +67,7 @@
 			},
 			{
 				"command": "giflens.deleteGif",
-				"title": "Remove",
+				"title": "Remove from History",
 				"icon": {
 					"dark": "docs/assets/icons/dark-trash-alt.svg",
 					"light": "docs/assets/icons/light-trash-alt.svg"
@@ -114,10 +114,6 @@
 				{
 					"id": "history",
 					"name": "Search History"
-				},
-				{
-					"id": "favorites",
-					"name": "Favorites"
 				}
 			]
 		},

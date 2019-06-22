@@ -22,6 +22,7 @@ suite('deleteGif removes a Gif from history', function() {
 			if (final) {
 				assert(final.length === 0);
 			} else {
+				// if final is falsy, it means that there is no array anymore
 				assert(false);
 			}
 			return waiter;

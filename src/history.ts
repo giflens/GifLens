@@ -11,20 +11,17 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryEntry> {
 
 	constructor(globalState: vscode.Memento) {
 		// created from the global state to be kept between sessions
-		this.history = globalState.get('history')
-			? globalState.get('history')
-			: undefined;
+		this.history = globalState.get('history');
 	}
 
 	refresh(globalState: vscode.Memento): void {
 		// keeping the history consistent with the global state
-		this.history = globalState.get('history')
-			? globalState.get('history')
-			: undefined;
+		this.history = globalState.get('history');
 		this._onDidChangeTreeData.fire();
 	}
 
 	getTreeItem(element: HistoryEntry): vscode.TreeItem {
+		element.tooltip = `${element.gifUri}`;
 		return element;
 	}
 
@@ -50,13 +47,5 @@ export class HistoryEntry extends vscode.TreeItem {
 		};
 		// maybe useless as our provider has only one type of node (this one), but will help at scaling eventually
 		this.contextValue = 'historyItem';
-	}
-
-	get tooltip(): string {
-		return `${this.gifUri}`;
-	}
-
-	get description(): string {
-		return this.gifUri;
 	}
 }
