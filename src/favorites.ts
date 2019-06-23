@@ -41,9 +41,9 @@ export class FavoritesEntry extends vscode.TreeItem {
 		super(label);
 		// this command is the one when clicking the name, could be removed, or changed to viewing the gif?
 		this.command = {
-			command: 'giflens.addGif',
-			title: 'Giflens Add Gif',
-			arguments: [gifUri],
+			command: 'giflens.viewGif',
+			title: 'View Gif',
+			arguments: [this],
 		};
 		// maybe useless as our provider has only one type of node (this one), but will help at scaling eventually
 		this.contextValue = 'favoritesItem';

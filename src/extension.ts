@@ -9,6 +9,7 @@ import { deleteGifFromHistory } from './deleteGif';
 import { FavoritesProvider, FavoritesEntry } from './favorites';
 import { addGifToFavorites } from './addToFavorites';
 import { removeGifFromFavorites } from './removeFromFavorites';
+import { viewGif } from './viewGif';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -58,9 +59,12 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	// register the add a GIFLENS tag command
-	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+	const addGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.addGif',
-		(gifUri: HistoryEntry | string, editor?: vscode.TextEditor) => {
+		(
+			gifUri: HistoryEntry | FavoritesEntry | string,
+			editor?: vscode.TextEditor
+		) => {
 			if (editor) {
 				addGifLensTagToEditor(
 					editor,
@@ -112,6 +116,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	// register the view Gif command
+	const viewGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.viewGif',
+		(gif: HistoryEntry | FavoritesEntry) => {
+			viewGif(gif);
+		}
+	);
+
 	// register the tree provider for history
 	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
 		'history',
@@ -127,12 +139,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		searchDisposable,
 		historyTreeViewDisposable,
-		addHistoryGifDisposable,
+		addGifDisposable,
 		deleteHistoryGifDisposable,
 		resetHistoryDisposable,
 		favoritesTreeViewDisposable,
 		addToFavoritesDisposable,
-		removeFromFavoritesDisposable
+		removeFromFavoritesDisposable,
+		viewGifDisposable
 	);
 
 	let api = { state: context.globalState };
