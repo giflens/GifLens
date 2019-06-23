@@ -80,6 +80,14 @@
 					"dark": "docs/assets/icons/dark-star.svg",
 					"light": "docs/assets/icons/light-star.svg"
 				}
+			},
+			{
+				"command": "giflens.removeFromFavorites",
+				"title": "Remove from Favorites",
+				"icon": {
+					"dark": "docs/assets/icons/dark-trash-alt.svg",
+					"light": "docs/assets/icons/light-trash-alt.svg"
+				}
 			}
 		],
 		"menus": {
@@ -114,6 +122,11 @@
 				{
 					"command": "giflens.addToFavorites",
 					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
+				},
+				{
+					"command": "giflens.removeFromFavorites",
+					"when": "view == favorites && viewItem == favoritesItem",
 					"group": "inline"
 				}
 			]
