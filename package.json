@@ -75,7 +75,11 @@
 			},
 			{
 				"command": "giflens.addToFavorites",
-				"title": "Add to Favorites"
+				"title": "Add to Favorites",
+				"icon": {
+					"dark": "docs/assets/icons/dark-star.svg",
+					"light": "docs/assets/icons/light-star.svg"
+				}
 			}
 		],
 		"menus": {
