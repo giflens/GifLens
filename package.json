@@ -98,6 +98,11 @@
 					"group": "inline"
 				},
 				{
+					"command": "giflens.addGif",
+					"when": "view == favorites && viewItem == favoritesItem",
+					"group": "inline"
+				},
+				{
 					"command": "giflens.deleteGif",
 					"when": "view == history && viewItem == historyItem",
 					"group": "inline"
