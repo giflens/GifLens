@@ -3,7 +3,7 @@ import { FavoritesEntry, FavoritesProvider } from './favorites';
 import { HistoryEntry } from './history';
 
 /**
- * deletes a gif from the history (all occurences)
+ * add a gif to the favorites
  * @param  {HistoryEntry} gif the gif to add to the favorites
  * @param  {vscode.Memento} state the state holder in which to get the current favorites to modify them
  * @param  {FavoritesProvider} favoritesTreeView the favorites tree view that is linked to the favorites menu, that needs to be refreshed for the change to appear to the user
