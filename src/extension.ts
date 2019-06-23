@@ -6,6 +6,7 @@ import searchHandler from './search';
 import { HistoryProvider, HistoryEntry } from './history';
 import { addGifLensTagToEditor } from './addGif';
 import { deleteGifFromHistory } from './deleteGif';
+import { FavoritesProvider } from './favorites';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -42,8 +43,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "giflens" is now active!');
 
-	// instantiate a history provider from the global state (extension permanent storage, works like a simple key value system)
+	// instantiate a history provider and a favorites provider from the global state (extension permanent storage, works like a simple key value system)
 	const historyTreeView = new HistoryProvider(context.globalState);
+	const favoritesTreeView = new FavoritesProvider(context.globalState);
 
 	// register the search command
 	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
@@ -98,12 +100,19 @@ export function activate(context: vscode.ExtensionContext) {
 		historyTreeView
 	);
 
+	// register the tree provider for favorites
+	const favoritesTreeViewDisposable = vscode.window.registerTreeDataProvider(
+		'favorites',
+		favoritesTreeView
+	);
+
 	context.subscriptions.push(
 		searchDisposable,
 		historyTreeViewDisposable,
 		addHistoryGifDisposable,
 		deleteHistoryGifDisposable,
-		resetHistoryDisposable
+		resetHistoryDisposable,
+		favoritesTreeViewDisposable
 	);
 
 	let api = { state: context.globalState };

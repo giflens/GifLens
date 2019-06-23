@@ -114,6 +114,10 @@
 				{
 					"id": "history",
 					"name": "Search History"
+				},
+				{
+					"id": "favorites",
+					"name": "Favorites"
 				}
 			]
 		},
