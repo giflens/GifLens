@@ -72,6 +72,10 @@
 					"dark": "docs/assets/icons/dark-trash-alt.svg",
 					"light": "docs/assets/icons/light-trash-alt.svg"
 				}
+			},
+			{
+				"command": "giflens.addToFavorites",
+				"title": "Add to Favorites"
 			}
 		],
 		"menus": {
@@ -95,6 +99,11 @@
 				},
 				{
 					"command": "giflens.deleteGif",
+					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
+				},
+				{
+					"command": "giflens.addToFavorites",
 					"when": "view == history && viewItem == historyItem",
 					"group": "inline"
 				}

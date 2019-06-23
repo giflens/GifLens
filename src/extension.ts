@@ -7,6 +7,7 @@ import { HistoryProvider, HistoryEntry } from './history';
 import { addGifLensTagToEditor } from './addGif';
 import { deleteGifFromHistory } from './deleteGif';
 import { FavoritesProvider } from './favorites';
+import { addGifToFavorites } from './addToFavorites';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -94,6 +95,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	// register the add to Favorites command
+	const addToFavoritesDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.addToFavorites',
+		(gif: HistoryEntry) => {
+			addGifToFavorites(gif, context.globalState, favoritesTreeView);
+		}
+	);
+
 	// register the tree provider for history
 	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
 		'history',
@@ -112,7 +121,8 @@ export function activate(context: vscode.ExtensionContext) {
 		addHistoryGifDisposable,
 		deleteHistoryGifDisposable,
 		resetHistoryDisposable,
-		favoritesTreeViewDisposable
+		favoritesTreeViewDisposable,
+		addToFavoritesDisposable
 	);
 
 	let api = { state: context.globalState };
