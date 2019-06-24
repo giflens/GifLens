@@ -43,7 +43,7 @@ export class FavoritesEntry extends vscode.TreeItem {
 		this.command = {
 			command: 'giflens.viewGif',
 			title: 'View Gif',
-			arguments: [this],
+			arguments: [{ url: gifUri, label }],
 		};
 		// maybe useless as our provider has only one type of node (this one), but will help at scaling eventually
 		this.contextValue = 'favoritesItem';
