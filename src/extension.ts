@@ -120,7 +120,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const viewGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.viewGif',
 		(gif: HistoryEntry | FavoritesEntry) => {
-			viewGif(gif);
+			viewGif(gif, context.workspaceState);
 		}
 	);
 
