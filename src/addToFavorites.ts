@@ -19,7 +19,7 @@ export const addGifToFavorites: (
 ) => {
 	const favorites: FavoritesEntry[] | undefined = state.get('favorites');
 	if (favorites) {
-		if (favorites.filter(entry => entry.gifUri === gif.gifUri).length !== 0) {
+		if (favorites.find(entry => entry.gifUri === gif.gifUri)) {
 			vscode.window.showInformationMessage(
 				'This GIF was already in your favorites'
 			);

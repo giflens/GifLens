@@ -31,7 +31,7 @@ export class FavoritesProvider
 			return Promise.resolve([]);
 		} else {
 			// from the root, returns the history list
-			return Promise.resolve(this.favorites ? this.favorites : []);
+			return Promise.resolve(this.favorites || []);
 		}
 	}
 }

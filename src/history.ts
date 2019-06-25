@@ -30,7 +30,7 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryEntry> {
 			return Promise.resolve([]);
 		} else {
 			// from the root, returns the history list
-			return Promise.resolve(this.history ? this.history : []);
+			return Promise.resolve(this.history || []);
 		}
 	}
 }
