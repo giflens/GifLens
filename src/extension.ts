@@ -46,6 +46,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "giflens" is now active!');
 
+	// reset workspaceState for the viewGif, to avoid issues (found a bug this way)
+	context.workspaceState.update('viewPanel', undefined);
+
 	// instantiate a history provider and a favorites provider from the global state (extension permanent storage, works like a simple key value system)
 	const historyTreeView = new HistoryProvider(context.globalState);
 	const favoritesTreeView = new FavoritesProvider(context.globalState);
