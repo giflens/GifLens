@@ -13,7 +13,7 @@ suite('Search Gifs', function() {
 		assert(results.length === 0);
 	});
 
-	test('given a pageNumber > 1, searchGif should return different results', async function() {
+	test('GIVEN a pageNumber > 1, searchGif SHOULD return different results', async function() {
 		const results = await searchGif('kylian mbappe');
 		const results2 = await searchGif('kylian mbappe', 2);
 		assert(results2.length > 0);
