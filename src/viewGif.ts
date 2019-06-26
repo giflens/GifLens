@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { HistoryEntry } from './history';
 import { FavoritesEntry } from './favorites';
 
-const viewWebViewHtml: (imageHtml: string) => string = (
+export const viewWebViewHtml: (imageHtml: string) => string = (
 	imageHtml: string
 ) => `<!DOCTYPE html>
 <html lang="en">
@@ -34,7 +34,7 @@ const viewWebViewHtml: (imageHtml: string) => string = (
 </body>
 </html>`;
 
-const createGifHtml: (gif: HistoryEntry | FavoritesEntry) => string = (
+export const createGifHtml: (gif: HistoryEntry | FavoritesEntry) => string = (
 	gif: HistoryEntry | FavoritesEntry
 ) =>
 	`<img id="gif" style="cursor: pointer;" src="${gif.gifUri}" alt="${
@@ -57,6 +57,7 @@ export const viewGif: (
 	if (existingPanel) {
 		existingPanel.webview.html = viewWebViewHtml(createGifHtml(gif));
 		existingPanel.title = gif.label;
+		attachListener(existingPanel, editor);
 	} else {
 		const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
 			'gifView', // Identifies the type of the webview. Used internally
@@ -68,19 +69,7 @@ export const viewGif: (
 		);
 		panel.webview.html = viewWebViewHtml(createGifHtml(gif));
 
-		// when the image is clicked, create a GIFLENS tag and close the webview
-		panel.webview.onDidReceiveMessage(message => {
-			panel.dispose();
-			if (editor) {
-				vscode.commands.executeCommand(
-					'giflens.addGif',
-					message.text.url,
-					editor
-				);
-			} else {
-				vscode.window.showInformationMessage('You had no active editor');
-			}
-		});
+		attachListener(panel, editor);
 
 		// when the panel is closed, the state is reinitialized
 		panel.onDidDispose(() => {
@@ -116,3 +105,26 @@ export class GifVizualizer {
 	 */
 	reset() {}
 }
+
+export const attachListener: (
+	panel: vscode.WebviewPanel,
+	editor: vscode.TextEditor | undefined
+) => void = (
+	panel: vscode.WebviewPanel,
+	editor: vscode.TextEditor | undefined
+) => {
+	// when the image is clicked, create a GIFLENS tag and close the webview
+	panel.webview.onDidReceiveMessage(message => {
+		panel.dispose();
+		if (editor) {
+			vscode.commands.executeCommand(
+				'giflens.addGif',
+				message.text.url,
+				editor
+			);
+		} else {
+			vscode.window.showInformationMessage('You had no active editor');
+		}
+	});
+	return;
+};
