@@ -1,12 +1,12 @@
-suite('ViewGif Command is correctly implemented', function() {
+suite('gifVisualizer Class is correctly implemented', function() {
 	test(
-		'GIVEN a Favorite or History Entry, viewGif SHOULD open a Webview with the Gif displayed inside'
+		'GIVEN a Gif and a editor, init SHOULD open a Webview panel and fill the properties of the instance'
 	);
 	test(
-		'GIVEN the webiew is created, clicking on the image SHOULD add it to the active editor'
+		'GIVEN a Gif and a editor, update SHOULD update a Webview panel and fill the properties of the instance'
 	);
 	test(
-		'GIVEN a GIF is currently displayed in a webview, WHEN the user cliks on another Gif, viewGif SHOULD modify the current webview and not create a new one'
+		'GIVEN GifVisualizer has a Webview panel that is disposed, reset SHOULD reset the instance properties'
 	);
 });
 

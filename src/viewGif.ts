@@ -41,25 +41,44 @@ export const createGifHtml: (gif: HistoryEntry | FavoritesEntry) => string = (
 		gif.label
 	}" />`;
 
-export const viewGif: (
-	gif: HistoryEntry | FavoritesEntry,
-	workspaceState: vscode.Memento
-) => void = (
-	gif: HistoryEntry | FavoritesEntry,
-	workspaceState: vscode.Memento
-) => {
-	// getting a possible existing viewGif webview (to avoid creating multiple webviews)
-	// workspaceState is reinitialized between sessions (different from globalState). It is also a Memento
-	const existingPanel: vscode.WebviewPanel | undefined = workspaceState.get(
-		'viewPanel'
-	);
-	const editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
-	if (existingPanel) {
-		existingPanel.webview.html = viewWebViewHtml(createGifHtml(gif));
-		existingPanel.title = gif.label;
-		attachListener(existingPanel, editor);
-	} else {
-		const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
+export enum GifVisualizerState {
+	Idle,
+	Active,
+}
+
+export class GifVisualizer {
+	// to conserve the current panel
+	panel?: vscode.WebviewPanel;
+	// the gif currently displayed
+	gif?: HistoryEntry | FavoritesEntry;
+	// the listener to webview messages
+	messageReceptionListener?: vscode.Disposable;
+	// the state of the visualizer
+	state: GifVisualizerState;
+	// the editor to which apply the GIFLENS tag when the image is clicked
+	editor?: vscode.TextEditor;
+
+	constructor() {
+		this.state = GifVisualizerState.Idle;
+	}
+
+	/**
+	 * Initialize a new Viewing session with the Gif to view
+	 * @param  {HistoryEntry|FavoritesEntry} gif
+	 */
+	init(
+		gif: HistoryEntry | FavoritesEntry,
+		editor: vscode.TextEditor | undefined
+	) {
+		if (editor) {
+			this.editor = editor;
+		} else {
+			vscode.window.showInformationMessage(
+				'You have no active editor, you wont be able to click-insert the Gif'
+			);
+		}
+
+		this.panel = vscode.window.createWebviewPanel(
 			'gifView', // Identifies the type of the webview. Used internally
 			gif.label, // Title of the panel displayed to the user
 			vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
@@ -67,64 +86,84 @@ export const viewGif: (
 				enableScripts: true,
 			}
 		);
-		panel.webview.html = viewWebViewHtml(createGifHtml(gif));
+		this.panel.webview.html = viewWebViewHtml(createGifHtml(gif));
 
-		attachListener(panel, editor);
+		// creating a Listener
+		this.messageReceptionListener = this.attachListener(
+			this.panel,
+			this.editor
+		);
 
 		// when the panel is closed, the state is reinitialized
-		panel.onDidDispose(() => {
+		this.panel.onDidDispose(() => {
 			// using undefined to remove a key from a Memento
-			workspaceState.update('viewPanel', undefined);
+			this.reset();
 		});
-		// placing the panel in the workspace state so that it is kept through the application for a later call
-		workspaceState.update('viewPanel', panel);
+
+		this.state = GifVisualizerState.Active;
 	}
-
-	return;
-};
-
-export class GifVizualizer {
-	panel?: vscode.WebviewPanel;
-	gif?: HistoryEntry | FavoritesEntry;
-	messageReceptionListener?: vscode.Disposable;
-
-	/**
-	 * Initialize a new Viewing session with the Gif to view
-	 * @param  {HistoryEntry|FavoritesEntry} gif
-	 */
-	init(gif: HistoryEntry | FavoritesEntry) {}
 
 	/**
 	 * During a Viewing session, update the Gif to view
 	 * @param  {HistoryEntry|FavoritesEntry} gif
 	 */
-	updateGif(gif: HistoryEntry | FavoritesEntry) {}
+	updateGif(
+		gif: HistoryEntry | FavoritesEntry,
+		editor: vscode.TextEditor | undefined
+	) {
+		if (this.panel && this.messageReceptionListener) {
+			this.panel.webview.html = viewWebViewHtml(createGifHtml(gif));
+			this.panel.title = gif.label;
+			this.messageReceptionListener.dispose();
+			if (editor) {
+				this.editor = editor;
+			}
+			this.messageReceptionListener = this.attachListener(
+				this.panel,
+				this.editor
+			);
+		} else {
+			throw new Error('There is no current panel');
+		}
+	}
 
 	/**
 	 * Terminate the Gif View Session (called on Dispose)
 	 */
-	reset() {}
-}
+	reset() {
+		this.panel = undefined;
+		this.gif = undefined;
+		this.messageReceptionListener = undefined;
+		this.state = GifVisualizerState.Idle;
+	}
 
-export const attachListener: (
-	panel: vscode.WebviewPanel,
-	editor: vscode.TextEditor | undefined
-) => void = (
-	panel: vscode.WebviewPanel,
-	editor: vscode.TextEditor | undefined
-) => {
-	// when the image is clicked, create a GIFLENS tag and close the webview
-	panel.webview.onDidReceiveMessage(message => {
-		panel.dispose();
-		if (editor) {
-			vscode.commands.executeCommand(
-				'giflens.addGif',
-				message.text.url,
-				editor
-			);
-		} else {
-			vscode.window.showInformationMessage('You had no active editor');
-		}
-	});
-	return;
-};
+	/**
+	 * For now, it does not point directly to the instance elements,
+	 * as part of the undefined mgt is done in the other methods
+	 * @param  {vscode.WebviewPanel} panel
+	 * @param  {vscode.TextEditor|undefined} editor
+	 * @returns  {vscode.Disposable} Listener disposable, useful to get rid of it on updates
+	 */
+	attachListener(
+		panel: vscode.WebviewPanel,
+		editor: vscode.TextEditor | undefined
+	) {
+		// when the image is clicked, create a GIFLENS tag and close the webview
+		// returns the disposable
+		return panel.webview.onDidReceiveMessage(message => {
+			panel.dispose();
+			this.reset();
+			if (editor) {
+				vscode.commands.executeCommand(
+					'giflens.addGif',
+					message.text.url,
+					editor
+				);
+			} else {
+				vscode.window.showInformationMessage(
+					'As you had no active editor, you are not able to click-insert this Gif'
+				);
+			}
+		});
+	}
+}

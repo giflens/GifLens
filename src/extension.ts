@@ -9,7 +9,7 @@ import { deleteGifFromHistory } from './deleteGif';
 import { FavoritesProvider, FavoritesEntry } from './favorites';
 import { addGifToFavorites } from './addToFavorites';
 import { removeGifFromFavorites } from './removeFromFavorites';
-import { viewGif } from './viewGif';
+import { GifVisualizer, GifVisualizerState } from './viewGif';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -52,6 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// instantiate a history provider and a favorites provider from the global state (extension permanent storage, works like a simple key value system)
 	const historyTreeView = new HistoryProvider(context.globalState);
 	const favoritesTreeView = new FavoritesProvider(context.globalState);
+
+	// initialize a GifVisualizer object to manage the view Gif
+	const gifVisualizer = new GifVisualizer();
 
 	// register the search command
 	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
@@ -123,7 +126,13 @@ export function activate(context: vscode.ExtensionContext) {
 	const viewGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.viewGif',
 		(gif: HistoryEntry | FavoritesEntry) => {
-			viewGif(gif, context.workspaceState);
+			if (gifVisualizer.state === GifVisualizerState.Idle) {
+				gifVisualizer.init(gif, vscode.window.activeTextEditor);
+			} else if (gifVisualizer.state === GifVisualizerState.Active) {
+				gifVisualizer.updateGif(gif, vscode.window.activeTextEditor);
+			} else {
+				throw new Error('There is no Gif Visualizer instantiated');
+			}
 		}
 	);
 
