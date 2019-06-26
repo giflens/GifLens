@@ -93,3 +93,26 @@ export const viewGif: (
 
 	return;
 };
+
+export class GifVizualizer {
+	panel?: vscode.WebviewPanel;
+	gif?: HistoryEntry | FavoritesEntry;
+	messageReceptionListener?: vscode.Disposable;
+
+	/**
+	 * Initialize a new Viewing session with the Gif to view
+	 * @param  {HistoryEntry|FavoritesEntry} gif
+	 */
+	init(gif: HistoryEntry | FavoritesEntry) {}
+
+	/**
+	 * During a Viewing session, update the Gif to view
+	 * @param  {HistoryEntry|FavoritesEntry} gif
+	 */
+	updateGif(gif: HistoryEntry | FavoritesEntry) {}
+
+	/**
+	 * Terminate the Gif View Session (called on Dispose)
+	 */
+	reset() {}
+}
