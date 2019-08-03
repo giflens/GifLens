@@ -6,11 +6,19 @@
 
 Visualize GIFLENS tags just by hovering them in your code.
 
-<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/thanos-bae.gif?raw=true" alt="hover gifs in your code"/>
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/20-thanossalt.gif?raw=true" alt="hover gifs in your code"/>
 
-Search for GIFs using the `giflens` command directly in VS Code.
+Search for GIFs using the `giflens` command, or the left side panel.
 
-<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/jon-snow.gif?raw=true" alt="search gifs in vscode"/>
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/20-jonsnow.gif?raw=true" alt="search gifs in vscode"/>
+
+Insert GIFs directly from your search history.
+
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/20-hover-arnold.gif?raw=true" alt="insert gifs from search history"/>
+
+Add GIFs to your favorites.
+
+<img src="https://github.com/giflens/GifLens/blob/master/docs/assets/20-favorite.gif?raw=true" alt="add gifs to favorites"/>
 
 ## Requirements
 
