@@ -30,7 +30,7 @@ export class HistoryProvider implements vscode.TreeDataProvider<HistoryEntry> {
 			return Promise.resolve([]);
 		} else {
 			// from the root, returns the history list
-			return Promise.resolve(this.history ? this.history : []);
+			return Promise.resolve(this.history || []);
 		}
 	}
 }
@@ -40,9 +40,9 @@ export class HistoryEntry extends vscode.TreeItem {
 		super(label);
 		// this command is the one when clicking the name, could be removed, or changed to viewing the gif?
 		this.command = {
-			command: 'giflens.addGif',
-			title: 'Giflens Add Gif',
-			arguments: [gifUri],
+			command: 'giflens.viewGif',
+			title: 'View Gif',
+			arguments: [{ gifUri, label }],
 		};
 		// maybe useless as our provider has only one type of node (this one), but will help at scaling eventually
 		this.contextValue = 'historyItem';

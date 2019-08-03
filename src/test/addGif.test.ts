@@ -9,17 +9,17 @@ import {
 } from '../addGif';
 
 suite('AddGif creates a GIFLENS tag', function() {
-	test('given a correct language identifier, getLanguageCommentStart should return the correct comment start', function() {
+	test('GIVEN a correct language identifier, getLanguageCommentStart SHOULD return the correct comment start', function() {
 		const commentStart = getLanguageCommentStart('c');
 		assert(commentStart === '/*');
 	});
 
-	test('given a correct language identifier, getLanguageCommentEnd should return the correct comment end', function() {
+	test('GIVEN a correct language identifier, getLanguageCommentEnd SHOULD return the correct comment end', function() {
 		const commentEnd = getLanguageCommentEnd('css');
 		assert(commentEnd === ' */');
 	});
 
-	test('given an editor and a non empty string, addGifLensTagToEditor correctly adds the GIFLENS tag', async function() {
+	test('GIVEN an editor and a non empty string, addGifLensTagToEditor correctly adds the GIFLENS tag', async function() {
 		const doc = await vscode.workspace.openTextDocument({
 			language: 'javascript',
 		});

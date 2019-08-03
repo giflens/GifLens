@@ -72,6 +72,26 @@
 					"dark": "docs/assets/icons/dark-trash-alt.svg",
 					"light": "docs/assets/icons/light-trash-alt.svg"
 				}
+			},
+			{
+				"command": "giflens.addToFavorites",
+				"title": "Add to Favorites",
+				"icon": {
+					"dark": "docs/assets/icons/dark-star.svg",
+					"light": "docs/assets/icons/light-star.svg"
+				}
+			},
+			{
+				"command": "giflens.removeFromFavorites",
+				"title": "Remove from Favorites",
+				"icon": {
+					"dark": "docs/assets/icons/dark-trash-alt.svg",
+					"light": "docs/assets/icons/light-trash-alt.svg"
+				}
+			},
+			{
+				"command": "giflens.viewGif",
+				"title": "View Gif"
 			}
 		],
 		"menus": {
@@ -94,8 +114,23 @@
 					"group": "inline"
 				},
 				{
+					"command": "giflens.addGif",
+					"when": "view == favorites && viewItem == favoritesItem",
+					"group": "inline"
+				},
+				{
 					"command": "giflens.deleteGif",
 					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
+				},
+				{
+					"command": "giflens.addToFavorites",
+					"when": "view == history && viewItem == historyItem",
+					"group": "inline"
+				},
+				{
+					"command": "giflens.removeFromFavorites",
+					"when": "view == favorites && viewItem == favoritesItem",
 					"group": "inline"
 				}
 			]
@@ -114,6 +149,10 @@
 				{
 					"id": "history",
 					"name": "Search History"
+				},
+				{
+					"id": "favorites",
+					"name": "Favorites"
 				}
 			]
 		},

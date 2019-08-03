@@ -4,7 +4,7 @@ import { HistoryProvider, HistoryEntry } from '../history';
 import { deleteGifFromHistory } from '../deleteGif';
 
 suite('deleteGif removes a Gif from history', function() {
-	test('given a a Gif to remove, deleteGif correctly removes it from the tree view and the global state', async function() {
+	test('given a a Gif to remove, deleteGif SHOULD correctly remove it from the tree view and the global state', async function() {
 		const extension = vscode.extensions.getExtension('giflens.giflens');
 		const state: undefined | vscode.Memento = extension
 			? extension.exports.state

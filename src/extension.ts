@@ -6,6 +6,10 @@ import searchHandler from './search';
 import { HistoryProvider, HistoryEntry } from './history';
 import { addGifLensTagToEditor } from './addGif';
 import { deleteGifFromHistory } from './deleteGif';
+import { FavoritesProvider, FavoritesEntry } from './favorites';
+import { addGifToFavorites } from './addToFavorites';
+import { removeGifFromFavorites } from './removeFromFavorites';
+import { GifVisualizer, GifVisualizerState } from './viewGif';
 
 const giflensRegexp = /GIFLENS-((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
@@ -42,8 +46,15 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "giflens" is now active!');
 
-	// instantiate a history provider from the global state (extension permanent storage, works like a simple key value system)
+	// reset workspaceState for the viewGif, to avoid issues (found a bug this way)
+	context.workspaceState.update('viewPanel', undefined);
+
+	// instantiate a history provider and a favorites provider from the global state (extension permanent storage, works like a simple key value system)
 	const historyTreeView = new HistoryProvider(context.globalState);
+	const favoritesTreeView = new FavoritesProvider(context.globalState);
+
+	// initialize a GifVisualizer object to manage the view Gif
+	const gifVisualizer = new GifVisualizer();
 
 	// register the search command
 	const searchDisposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
@@ -54,9 +65,12 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	// register the add a GIFLENS tag command
-	const addHistoryGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+	const addGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
 		'giflens.addGif',
-		(gifUri: HistoryEntry | string, editor?: vscode.TextEditor) => {
+		(
+			gifUri: HistoryEntry | FavoritesEntry | string,
+			editor?: vscode.TextEditor
+		) => {
 			if (editor) {
 				addGifLensTagToEditor(
 					editor,
@@ -92,18 +106,58 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
+	// register the add to Favorites command
+	const addToFavoritesDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.addToFavorites',
+		(gif: HistoryEntry) => {
+			addGifToFavorites(gif, context.globalState, favoritesTreeView);
+		}
+	);
+
+	// register the remove from Favorites command
+	const removeFromFavoritesDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.removeFromFavorites',
+		(gif: FavoritesEntry) => {
+			removeGifFromFavorites(gif, context.globalState, favoritesTreeView);
+		}
+	);
+
+	// register the view Gif command
+	const viewGifDisposable: vscode.Disposable = vscode.commands.registerCommand(
+		'giflens.viewGif',
+		(gif: HistoryEntry | FavoritesEntry) => {
+			if (gifVisualizer.state === GifVisualizerState.Idle) {
+				gifVisualizer.init(gif, vscode.window.activeTextEditor);
+			} else if (gifVisualizer.state === GifVisualizerState.Active) {
+				gifVisualizer.updateGif(gif, vscode.window.activeTextEditor);
+			} else {
+				throw new Error('There is no Gif Visualizer instantiated');
+			}
+		}
+	);
+
 	// register the tree provider for history
 	const historyTreeViewDisposable = vscode.window.registerTreeDataProvider(
 		'history',
 		historyTreeView
 	);
 
+	// register the tree provider for favorites
+	const favoritesTreeViewDisposable = vscode.window.registerTreeDataProvider(
+		'favorites',
+		favoritesTreeView
+	);
+
 	context.subscriptions.push(
 		searchDisposable,
 		historyTreeViewDisposable,
-		addHistoryGifDisposable,
+		addGifDisposable,
 		deleteHistoryGifDisposable,
-		resetHistoryDisposable
+		resetHistoryDisposable,
+		favoritesTreeViewDisposable,
+		addToFavoritesDisposable,
+		removeFromFavoritesDisposable,
+		viewGifDisposable
 	);
 
 	let api = { state: context.globalState };
