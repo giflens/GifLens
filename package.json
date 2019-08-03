@@ -2,7 +2,7 @@
 	"name": "giflens",
 	"displayName": "Giflens",
 	"description": "Like Gitlens, but with GIFs",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"publisher": "giflens",
 	"keywords": [
 		"gif",
